@@ -1,5 +1,5 @@
 import tkinter as tk
-import pyautogui
+import pyautogui as key
 
 class Keypad(object):
     def __init__(self, root):
