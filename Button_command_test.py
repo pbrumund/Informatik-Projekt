@@ -15,7 +15,7 @@ class Keypad(object):
             for x in range(4):
                 Buttons.append(Button(name= self.keys[y][x], x=x, y=y, index=x+(4*y), button_text= 'empty'))
         for i in range(16):
-            tk_Buttons[i].config(command= Buttons[i].print_text())
+            tk_Buttons[i].config(command= Buttons[i].print_text)
 class Button (object):
     def __init__(self, name, x, y, index, button_text= 'empty'):
         tk_Buttons.append(tk.Button(Window, 
