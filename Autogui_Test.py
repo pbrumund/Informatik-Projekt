@@ -1,5 +1,5 @@
 import pyautogui
 import time
 
-time.sleep(5)
-pyautogui.typewrite('test', interval=0.5)
+time.sleep(2)
+pyautogui.typewrite('testtesttest')
