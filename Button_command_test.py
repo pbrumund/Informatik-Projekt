@@ -3,6 +3,7 @@ import pyautogui as key
 
 Buttons= []
 tk_Buttons= []
+cur_button= 0
 class Keypad(object):
      def __init__(self, Window):
         self.keys=[
@@ -32,14 +33,18 @@ class Button (object):
     def get_text(self):
         return self.button_text
 class Save_button (object):
-    def __init__(self):
-        pass
-    def save_text(button_index):
+    def __init__(self, Window):
+        tk_save_button= tk.Button(Window, command= Save_button.save_text, text= 'Save')
+        tk_save_button.grid(row=0, column=4)
+    def save_text(button_index=cur_button):
         pass
 
 Window= tk.Tk()
 Window.title('Keypad')
 Keypad= Keypad(Window)
+save_button= Save_button(Window)
 Button.change_text(Buttons[3], new_text= 'test')
+Button.change_text(Buttons[5], new_text= 'text')
+Button.change_text(Buttons[0], new_text= r'\frac{}{}')
 print(Buttons[3].get_text())
 Window.mainloop()
