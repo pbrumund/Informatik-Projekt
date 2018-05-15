@@ -20,7 +20,6 @@ class Keypad(object):
 class Button (object):
     def __init__(self, name, x, y, index, button_text= 'empty'):
         tk_Buttons.append(tk.Button(Window, 
-        #command= Buttons[index].print_text(),
         text= name))
         tk_Buttons[index].grid(row= y, column= x)
         self.button_text= button_text
