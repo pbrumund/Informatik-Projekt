@@ -39,20 +39,40 @@ class Button (object):
 class Save_button (object):
     def __init__(self, Window):
         save_button= tk.Button(Window, command= Save_button.save_text, text= 'Save')
-        save_button.grid(row=0, column=5)
+        save_button.grid(row=1, column=5)
     def save_text():
         global cur_button
         Buttons[cur_button].print_text()
         #print (cur_button)
 class Text_field (object):
     def __init__(self, Window):
-        text_field= tk.Text(Window, height= 1, width= 30)
-        text_field.grid(row= 0, column= 4)
+        text_field= tk.Entry(Window) #Entry ist im Gegensatz zu Text von Anfang an sichtbar.
+        text_field.grid(row= 1, column= 4)
+class Text_field2 (object):
+    def __init__(self, Window):
+        text_field2= tk.Entry(Window) 
+        text_field2.grid(row= 3, column= 4)
+
+
+class Submit_button (object):
+    def __init__(self, Window):
+        submit_button= tk.Button(Window, command= Submit_button.submit_text, text= 'Submit')
+        submit_button.grid(row=3, column=5)
+    def submit_text():
+        pass #noch keine Funktion
+    
+    
 Window= tk.Tk()
 Window.title('Keypad')
 Keypad= Keypad(Window)
 Save_button= Save_button(Window)
+Submit_button=Submit_button(Window)
+label1 = tk.Label(Window, text="Neue Belegung für Taste:")
+label1.grid(row=0,column=4)
+label2 = tk.Label(Window, text="Zu verändernde Taste:")
+label2.grid(row=2,column=4)
 Text_field= Text_field(Window)
+Text_field2=Text_field2(Window)
 Button.change_text(Buttons[3], new_text= 'test')
 Button.change_text(Buttons[5], new_text= 'text')
 Button.change_text(Buttons[0], new_text= r'\frac{}{}')
