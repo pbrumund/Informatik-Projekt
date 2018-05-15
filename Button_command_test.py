@@ -57,7 +57,7 @@ class Text_field2 (object):
 
 class Submit_button (object):
     def __init__(self, Window):
-        submit_button= tk.Button(Window, command= Submit_button.submit_text, text= 'Submit')
+        submit_button= tk.Button(Window,command= Submit_button.submit_text, text= 'Submit')
         submit_button.grid(row=3, column=5)
     def submit_text():
         pass #noch keine Funktion
@@ -68,9 +68,9 @@ Window.title('Keypad')
 Keypad= Keypad(Window)
 Save_button= Save_button(Window)
 Submit_button=Submit_button(Window)
-label1 = tk.Label(Window, text="Neue Belegung für Taste:")
+label1 = tk.Label(Window,background='chocolate1', text="Neue Belegung für Taste:")
 label1.grid(row=0,column=4)
-label2 = tk.Label(Window, text="Zu verändernde Taste:")
+label2 = tk.Label(Window,background='chocolate1', text="Ausgewählte Taste:")
 label2.grid(row=2,column=4)
 Text_field= Text_field(Window)
 Text_field2=Text_field2(Window)
