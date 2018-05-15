@@ -35,6 +35,7 @@ class Button (object):
     def set_cur_button(self):
         global cur_button
         cur_button=self.index
+        Text_field.update_text(self.button_text)
         #print (cur_button)
 class Save_button (object):
     def __init__(self, Window):
@@ -46,8 +47,12 @@ class Save_button (object):
         #print (cur_button)
 class Text_field (object):
     def __init__(self, Window):
-        text_field= tk.Entry(Window) #Entry ist im Gegensatz zu Text von Anfang an sichtbar.
-        text_field.grid(row= 1, column= 4)
+        self.text_field= tk.Entry(Window) #Entry ist im Gegensatz zu Text von Anfang an sichtbar.
+        self.text_field.grid(row= 1, column= 4)
+    def update_text(self, text):
+        self.text_field.delete(0,'end')
+        self.text_field.insert(0,text)
+
 class Text_field2 (object):
     def __init__(self, Window):
         text_field2= tk.Entry(Window) 
