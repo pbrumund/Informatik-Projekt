@@ -2,7 +2,7 @@ import tkinter as tk
 import pyautogui as key
 
 Buttons= []
-#tk_Buttons= []
+
 cur_button= 0
 class Keypad(object):
      def __init__(self, Window):
@@ -15,8 +15,7 @@ class Keypad(object):
         for y in range(4):
             for x in range(4):
                 Buttons.append(Button(name= self.keys[y][x], x=x, y=y, index=x+(4*y), button_text= 'empty'))
-        #for i in range(16):
-         #   tk_Buttons[i].config(command= Buttons[i].set_cur_button)
+        
 class Button (object):
     def __init__(self, name, x, y, index, button_text= 'empty'):
         self.button=tk.Button(Window, command= self.set_cur_button, text= name)
