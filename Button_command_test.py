@@ -1,11 +1,8 @@
 import tkinter as tk
 import pyautogui as key
+from tkinter import ttk
 
 Buttons= []
-<<<<<<< HEAD
-=======
-
->>>>>>> 445048b7d7575a3e665fc49181e9c2838865d3a0
 cur_button= 0
 class Keypad(object):
      def __init__(self, Window):
@@ -17,18 +14,18 @@ class Keypad(object):
         ]
         for y in range(4):
             for x in range(4):
-                Buttons.append(Button(name= self.keys[y][x], x=x, y=y, index=x+(4*y), button_text= 'empty'))
+                Buttons.append(Button(name= self.keys[y][x], x=x, y=y, index=x+(4*y)))
         
 class Button (object):
-    def __init__(self, name, x, y, index, button_text= 'empty'):
-        self.button=tk.Button(Window, command= self.set_cur_button, text= name)
+    def __init__(self, name, x, y, index, button_text= ''):
+        self.button=tk.ttk.Button(Window, command= self.set_cur_button, text= name)
         self.button.grid(row= y, column= x)
         self.button_text= button_text
         self.index= index
     def change_text(self, new_text):
         self.button_text= new_text
-    def print_text(self):
-        print (self.button_text)
+    #def print_text(self):
+     #   print (self.button_text)
     def exec_command(self):
         pass    
     def get_text(self):
@@ -37,22 +34,22 @@ class Button (object):
         global cur_button
         cur_button=self.index
         Text_field.update_text(self.button_text)
-        #print (cur_button)
+        Text_field.text_field.icursor(0)
+        
 
 class Save_button (object):
     def __init__(self, Window):
-        save_button= tk.Button(Window, command= Save_button.save_text, text= 'Save')
-        save_button.grid(row=1, column=5)
+        save_button= tk.ttk.Button(Window, command= Save_button.save_text, text= 'Save')
+        save_button.grid(row=5, column=2)
     def save_text():
         global cur_button
         text= Text_field.text_field.get()
         Buttons[cur_button].change_text(text)
-        #print (cur_button)
-
+        
 class Text_field (object):
     def __init__(self, Window):
         self.text_field= tk.Entry(Window) #Entry ist im Gegensatz zu Text von Anfang an sichtbar.
-        self.text_field.grid(row= 1, column= 4)
+        self.text_field.grid(row= 5, column= 0, columnspan= 2)
     def update_text(self, text):# Ändert den gegebenen Text
         self.text_field.delete(0,'end')
         self.text_field.insert(0,text)
@@ -75,15 +72,12 @@ Window= tk.Tk()
 Window.title('Keypad')
 Keypad= Keypad(Window)
 Save_button= Save_button(Window)
-Submit_button=Submit_button(Window)
+#Submit_button=Submit_button(Window)
 label1 = tk.Label(Window, text="Neue Belegung für Taste:")
-label1.grid(row=0,column=4)
-label2 = tk.Label(Window, text="Zu verändernde Taste:")
-label2.grid(row=2,column=4)
+label1.grid(row=4,column=0, columnspan= 2)
+#label2 = tk.Label(Window, text="Zu verändernde Taste:")
+#label2.grid(row=2,column=4)
 Text_field= Text_field(Window)
-Text_field2=Text_field2(Window)
-Button.change_text(Buttons[3], new_text= 'test')
-Button.change_text(Buttons[5], new_text= 'text')
-Button.change_text(Buttons[0], new_text= r'\frac{}{}')
-print(Buttons[3].get_text())
+#Text_field2= Text_field2(Window)
+
 Window.mainloop()
