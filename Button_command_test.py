@@ -2,7 +2,6 @@ import tkinter as tk
 import pyautogui as key
 
 Buttons= []
-#tk_Buttons= []
 cur_button= 0
 class Keypad(object):
      def __init__(self, Window):
@@ -15,8 +14,7 @@ class Keypad(object):
         for y in range(4):
             for x in range(4):
                 Buttons.append(Button(name= self.keys[y][x], x=x, y=y, index=x+(4*y), button_text= 'empty'))
-        #for i in range(16):
-         #   tk_Buttons[i].config(command= Buttons[i].set_cur_button)
+        
 class Button (object):
     def __init__(self, name, x, y, index, button_text= 'empty'):
         self.button=tk.Button(Window, command= self.set_cur_button, text= name)
@@ -36,14 +34,17 @@ class Button (object):
         cur_button=self.index
         Text_field.update_text(self.button_text)
         #print (cur_button)
+
 class Save_button (object):
     def __init__(self, Window):
         save_button= tk.Button(Window, command= Save_button.save_text, text= 'Save')
         save_button.grid(row=1, column=5)
     def save_text():
         global cur_button
-        Buttons[cur_button].print_text()
+        text= Text_field.text_field.get()
+        Buttons[cur_button].change_text(text)
         #print (cur_button)
+
 class Text_field (object):
     def __init__(self, Window):
         self.text_field= tk.Entry(Window) #Entry ist im Gegensatz zu Text von Anfang an sichtbar.
