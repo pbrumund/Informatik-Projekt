@@ -2,6 +2,10 @@ import tkinter as tk
 import pyautogui as key
 
 Buttons= []
+<<<<<<< HEAD
+=======
+
+>>>>>>> 445048b7d7575a3e665fc49181e9c2838865d3a0
 cur_button= 0
 class Keypad(object):
      def __init__(self, Window):
