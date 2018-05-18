@@ -9,7 +9,11 @@ def call_function(event):
     pass
 
 
+<<<<<<< HEAD
 arduino = serial.Serial('/dev/cu.usbmodem14111',9600,timeout=0.1)
+=======
+arduino = serial.Serial('COM3',9600,timeout=0.1)
+>>>>>>> 41261a43fcdcb5e6d1ae63742cc15330ff277d1d
 
 def listen():
     read = arduino.readline()#.decode('utf-8')
@@ -37,9 +41,6 @@ class Keypad(object):   #Erzeugt die Buttons des Keypads
 class Button (object):
     def __init__(self, name, x, y, index, button_text= ''):
         style= tk.ttk.Style()
-        #style2= tk.ttk.Style()
-
-        #style.configure("Standard_Button.TButton", foreground="black", background="white")
         style.configure("Active_Button.TButton", foreground="black", background="blue")
         self.button=tk.ttk.Button(Window, command= self.set_cur_button, text= name) #Erzeugt Button über tkinter
         self.button.grid(row= y, column= x)     
@@ -61,8 +62,7 @@ class Button (object):
         cur_button=self.index
         Buttons[cur_button].button.configure(style= "Active_Button.TButton")
         Text_field.update_text(self.button_text)      #Zeigt den Text des ausgewählten Buttons im Textfeld an
-        #Text_field.text_field.icursor(0)
-        
+              
 
 class Save_button (object):     #Button zum speichern
     def __init__(self, Window):     #Erzeut Button
