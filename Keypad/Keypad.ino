@@ -3,12 +3,21 @@
 const byte ROWS = 4;
 const byte COLS = 4;
 
-char keys[ROWS][COLS] = {
- {'A','B','C','D'},
- {'E','F','G','H'},
- {'I','J','K','L'},
- {'M','N','O','X'}
+/*String keys[ROWS][COLS] = {
+ {'0','1','2','3'},
+ {'4','5','6','7'},
+ {'8','9','10','11'},
+ {'12','13','14','15'}
+};*/
+
+uint8_t keys[ROWS][COLS] = {
+ {1,2,3,4},
+ {5,6,7,8},
+ {9,10,11,12},
+ {13,14,15,16}
 };
+
+
 
 
 byte rowPins[ROWS] = {7,6,5,4};
@@ -28,7 +37,7 @@ void setup()
 
 void loop()
 {
-  char key = kpd.getKey();
+  uint8_t key = kpd.getKey();
   if(key)  // Check for a valid key.
   {
     switch (key)

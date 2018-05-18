@@ -9,12 +9,14 @@ def call_function(event):
     pass
 
 
-arduino = serial.Serial('/dev/cu.usbmodem14311',9600,timeout=1)
+arduino = serial.Serial('/dev/cu.usbmodem14111',9600,timeout=0.1)
 
 def listen():
-    read = arduino.readline()
+    read = arduino.readline()#.decode('utf-8')
     if (read):
-        print("Aktion registriert")
+        print(int(read))
+        i= int(read)-1
+        Buttons[i].exec_command()
     Window.after(10,listen)
         
 
@@ -45,10 +47,12 @@ class Button (object):
         self.index= index   #Position in der Liste
     def change_text(self, new_text):    #ändert den Text
         self.button_text= new_text
+        
     #def print_text(self):
      #   print (self.button_text)
     def exec_command(self):
-        pass    
+        print(self.button_text)    
+        key.typewrite(self.button_text, interval= 0.01)
     def get_text(self):     #Gibt den gespeicherten Text aus
         return self.button_text
     def set_cur_button(self):      #Setzt den angeklickten Button als aktuell ausgewählten Button, der bearbeitet werden soll
