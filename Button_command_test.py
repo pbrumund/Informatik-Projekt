@@ -15,6 +15,7 @@ def listen():
     read = arduino.readline()
     if (read):
         print("Aktion registriert")
+        print(read)
     Window.after(10,listen)
         
 
