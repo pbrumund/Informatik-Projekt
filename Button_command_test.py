@@ -22,7 +22,7 @@ class Button (object):
         style2= tk.ttk.Style()
 
         #style.configure("Standard_Button.TButton", foreground="black", background="white")
-        style2.configure("Active_Button.TButton", foreground="black", background="blue")
+        style2.configure("Active_Button.TButton", foreground="blue", background="blue")
         self.button=tk.ttk.Button(Window, command= self.set_cur_button, text= name) #Erzeugt Button über tkinter
         self.button.grid(row= y, column= x)     
         self.button_text= button_text   #geespeicherter Text, der geändert werden kann
