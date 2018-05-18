@@ -1,9 +1,25 @@
 import tkinter as tk
 import pyautogui as key
+import serial
 from tkinter import ttk
 
 Buttons= []
 cur_button= 0
+def call_function(event):
+    pass
+
+
+arduino = serial.Serial('COM3',9600,timeout=0.1)
+
+def listen():
+    read = arduino.readline()
+    if (read):
+        print("Aktion registriert")
+    Window.after(10,listen)
+        
+
+
+
 class Keypad(object):   #Erzeugt die Buttons des Keypads
      def __init__(self, Window):
         self.keys=[     #Beschriftungen der Buttons
@@ -19,10 +35,7 @@ class Keypad(object):   #Erzeugt die Buttons des Keypads
 class Button (object):
     def __init__(self, name, x, y, index, button_text= ''):
         style= tk.ttk.Style()
-        style2= tk.ttk.Style()
-
-        #style.configure("Standard_Button.TButton", foreground="black", background="white")
-        style2.configure("Active_Button.TButton", foreground="blue", background="blue")
+        style.configure("Active_Button.TButton", foreground="black", background="blue")
         self.button=tk.ttk.Button(Window, command= self.set_cur_button, text= name) #Erzeugt Button über tkinter
         self.button.grid(row= y, column= x)     
         self.button_text= button_text   #geespeicherter Text, der geändert werden kann
@@ -41,8 +54,7 @@ class Button (object):
         cur_button=self.index
         Buttons[cur_button].button.configure(style= "Active_Button.TButton")
         Text_field.update_text(self.button_text)      #Zeigt den Text des ausgewählten Buttons im Textfeld an
-        #Text_field.text_field.icursor(0)
-        
+              
 
 class Save_button (object):     #Button zum speichern
     def __init__(self, Window):     #Erzeut Button
@@ -67,12 +79,6 @@ class Text_field2 (object):
         text_field2.grid(row= 3, column= 4)
 
 
-class Submit_button (object):
-    def __init__(self, Window):
-        submit_button= tk.Button(Window, command= Submit_button.submit_text, text= 'Submit')
-        submit_button.grid(row=3, column=5)
-    def submit_text():
-        pass #noch keine Funktion
     
     
 Window= tk.Tk()     #Erzeut Fenster
@@ -89,5 +95,5 @@ label1.grid(row=4,column=0, columnspan= 2)
 #label2.grid(row=2,column=4)
 Text_field= Text_field(Window)
 #Text_field2= Text_field2(Window)
-
+listen()
 Window.mainloop()
