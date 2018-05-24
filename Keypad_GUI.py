@@ -7,11 +7,6 @@ import socket as so
 Buttons= []
 cur_button= 0
 
-#not_working_keys= ['ü','ö','ä','Ü','Ö','Ä','^','ß','´','°','§','²','³','{','}','+','~','#','@','€','<','|']
-#windows_commands= ['ü','ö','ä','Ü','Ö','','','','','^','','ctrl alt 2','ctrl alt 3','ctrl alt 7','ctrl alt 0','','ctrl alt +',
-#'','ctrl alt q','ctrl alt e','','ctrl alt <']
-
-
 class Arduino(object):
     def __init__(self, window):
         self.arduino = serial.Serial('COM7',9600,timeout=0.1)
@@ -29,8 +24,6 @@ class Arduino(object):
 class Window(object):
     def __init__(self):
         self.window= tk.Tk()
-
-        #self.update_keys()
                 
         self.label1 = tk.Label(self.window, text="Neue Belegung für Taste:")
         self.label1.grid(row=4,column=0, columnspan= 2)
@@ -72,7 +65,7 @@ class Button (object):
         self.button_text= new_text
         
     def exec_command(self):
-        key.typewrite(self.button_text, interval= 0.01)
+        key.typewrite(self.button_text, interval= 0.00)
         
     def get_text(self):     #Gibt den gespeicherten Text aus
         return self.button_text
@@ -108,20 +101,3 @@ class Text_field (object):
 
     
 window= Window()  
-<<<<<<< HEAD:Keypad_GUI.py
-=======
-#Window= tk.Tk()     #Erzeut Fenster
-#Window.title('Keypad')
-
-
-
-#Keypad= Keypad(Window)  #Erzeugt Keypad
-#Save_button= Save_button(Window)  
-#label1 = tk.Label(Window, text="Neue Belegung für Taste:")
-#label1.grid(row=4,column=0, columnspan= 2)
-#Text_field= Text_field(Window)
-#Buttons[1].button_text= "{}"
-
-#listen()
-#Window.mainloop()
->>>>>>> a98fdb0dd2251eb301eacab5c6f359fa9bb6cc94:Keypad_GUI.py

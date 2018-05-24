@@ -17,6 +17,20 @@ try:
 except AttributeError:
     pass # Windows XP doesn't support this, so just do nothing.
 
+"""
+Codes für Zeichen hinzugefügt:
+    'ü': 0xba,
+    'Ü': 0x1ba,
+    'ö': 0xc0,
+    'Ö': 0x1c0,
+    'ä': 0xde,
+    'Ä': 0x1de,
+    'ß': 0xdb,
+    '^': 0xdc,
+    '°': 0x1dc,
+"""
+
+
 
 """
 A lot of this code is probably repeated from win32 extensions module, but I didn't want to have that dependency.
@@ -235,6 +249,16 @@ keyboardMapping.update({
     'launchmediaselect': 0xb5, # VK_LAUNCH_MEDIA_SELECT
     'launchapp1': 0xb6, # VK_LAUNCH_APP1
     'launchapp2': 0xb7, # VK_LAUNCH_APP2
+    'ü': 0xba,
+    'Ü': 0x1ba,
+    'ö': 0xc0,
+    'Ö': 0x1c0,
+    'ä': 0xde,
+    'Ä': 0x1de,
+    'ß': 0xdb,
+    '^': 0xdc,
+    '°': 0x1dc,
+    '§': 0x133,
     #';': 0xba, # VK_OEM_1
     #'+': 0xbb, # VK_OEM_PLUS
     #',': 0xbc, # VK_OEM_COMMA
