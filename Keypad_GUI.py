@@ -7,13 +7,10 @@ import socket as so
 Buttons= []
 cur_button= 0
 
-not_working_keys= ['ü','ö','ä','Ü','Ö','Ä','^','ß','´','°','§','²','³','{','}','+','~','#','@','€','<','|']
-windows_commands= ['ü','ö','ä','Ü','Ö','','','','','^','','ctrl alt 2','ctrl alt 3','ctrl alt 7','ctrl alt 0','','ctrl alt +',
-'','ctrl alt q','ctrl alt e','','ctrl alt <']
+#not_working_keys= ['ü','ö','ä','Ü','Ö','Ä','^','ß','´','°','§','²','³','{','}','+','~','#','@','€','<','|']
+#windows_commands= ['ü','ö','ä','Ü','Ö','','','','','^','','ctrl alt 2','ctrl alt 3','ctrl alt 7','ctrl alt 0','','ctrl alt +',
+#'','ctrl alt q','ctrl alt e','','ctrl alt <']
 
-key._pyautogui_win.keyboardMapping.update({'+': 0x6b})
-
-#arduino = serial.Serial('COM7',9600,timeout=0.1)
 
 class Arduino(object):
     def __init__(self, window):
@@ -32,6 +29,8 @@ class Arduino(object):
 class Window(object):
     def __init__(self):
         self.window= tk.Tk()
+
+        #self.update_keys()
                 
         self.label1 = tk.Label(self.window, text="Neue Belegung für Taste:")
         self.label1.grid(row=4,column=0, columnspan= 2)
@@ -41,9 +40,10 @@ class Window(object):
 
         self.arduino= Arduino(self.window)
         self.arduino.listen()
-        #listen(self.window)
-        self.window.mainloop()
         
+        self.window.mainloop()
+    
+            
 
 class Keypad(object):   #Erzeugt die Buttons des Keypads
      def __init__(self, window, text_field):
@@ -72,17 +72,8 @@ class Button (object):
         self.button_text= new_text
         
     def exec_command(self):
-        print(self.button_text)    
         key.typewrite(self.button_text, interval= 0.01)
-        """for letter in self.button_text:
-            if letter=='{':
-                key.hotkey('ctrl','alt','7')
-            elif letter=='}':
-                key.hotkey('ctrl','alt','0')
-            else:
-                key.press(letter,pause=0.01)
-            #time.sleep(0.01)"""
-
+        
     def get_text(self):     #Gibt den gespeicherten Text aus
         return self.button_text
 
@@ -109,6 +100,7 @@ class Text_field (object):
     def __init__(self, Window):
         self.text_field= tk.Entry(Window) #Entry ist im Gegensatz zu Text von Anfang an sichtbar.
         self.text_field.grid(row= 5, column= 0, columnspan= 2)
+        
     def update_text(self, text):# Ändert den gegebenen Text
         self.text_field.delete(0,'end') #Leert das Feld
         self.text_field.insert(0,text)  #Neuer Text
@@ -116,17 +108,3 @@ class Text_field (object):
 
     
 window= Window()  
-#Window= tk.Tk()     #Erzeut Fenster
-#Window.title('Keypad')
-
-
-
-#Keypad= Keypad(Window)  #Erzeugt Keypad
-#Save_button= Save_button(Window)  
-#label1 = tk.Label(Window, text="Neue Belegung für Taste:")
-#label1.grid(row=4,column=0, columnspan= 2)
-#Text_field= Text_field(Window)
-#Buttons[1].button_text= "{}"
-
-#listen()
-#Window.mainloop()

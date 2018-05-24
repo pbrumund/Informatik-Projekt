@@ -1,6 +1,5 @@
-#include <Key.h>
-#include <Keypad.h>
-
+#include "Key.h"
+#include "Keypad.h"
 
 
 const byte ROWS = 4;
@@ -13,8 +12,7 @@ uint8_t keys[ROWS][COLS] = {
   {13, 14, 15, 16}
 };
 
-
-byte rowPins[ROWS] = {7, 6, 5, 4};
+byte rowPins[ROWS] = {4, 5, 6, 7};
 byte colPins[COLS] = {10, 11, 12, 13};
 
 Keypad kpd = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS );
@@ -31,6 +29,5 @@ void loop()
   {
     Serial.println(key);
   }
-
 }
 
