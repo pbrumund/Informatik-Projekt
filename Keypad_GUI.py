@@ -108,3 +108,20 @@ class Text_field (object):
 
     
 window= Window()  
+<<<<<<< HEAD:Keypad_GUI.py
+=======
+#Window= tk.Tk()     #Erzeut Fenster
+#Window.title('Keypad')
+
+
+
+#Keypad= Keypad(Window)  #Erzeugt Keypad
+#Save_button= Save_button(Window)  
+#label1 = tk.Label(Window, text="Neue Belegung für Taste:")
+#label1.grid(row=4,column=0, columnspan= 2)
+#Text_field= Text_field(Window)
+#Buttons[1].button_text= "{}"
+
+#listen()
+#Window.mainloop()
+>>>>>>> a98fdb0dd2251eb301eacab5c6f359fa9bb6cc94:Keypad_GUI.py
