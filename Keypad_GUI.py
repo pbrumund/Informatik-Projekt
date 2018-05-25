@@ -74,15 +74,19 @@ class Button (object):
             #Führt Tastenkombination aus
             
             command_keys= self.button_text.split()
+
+
+
             for command_key in command_keys:
-                key.keyDown(command_key)
+                key.keyDown(command_key, pause=0.1)
                 print(command_key)
-                time.sleep(0.1)
-            time.sleep(0.1)
-            for command_key in reversed(command_keys):    
-                key.keyUp(command_key)
-                print(command_key)
-                time.sleep(0.1)
+                #time.sleep(0.001)
+            #time.sleep(0.1)
+            for command_key_up in reversed(command_keys):    
+                key.platformModule._keyUp(command_key_up)
+                print(command_key_up)
+                #time.sleep(0.001)
+            #time.sleep(0.1)
             #Gibt Text ein  
         else:              
             key.typewrite(self.button_text, interval= 0.00)
@@ -128,4 +132,7 @@ class Command_checkbutton(object):
         self.checkbutton.grid(row=5, column= 3)
     def update_checked(self, checked):
         self.checked.set(checked)
+
+#key.hotkey('ctrl','shift','esc')
 window= Window()  
+
