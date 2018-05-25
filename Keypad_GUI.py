@@ -3,6 +3,7 @@ import pyautogui as key
 import serial
 from tkinter import ttk
 import socket as so
+import time
 
 Buttons= []
 cur_button= 0
@@ -69,7 +70,22 @@ class Button (object):
         self.is_command= is_command
         
     def exec_command(self):
-        key.typewrite(self.button_text, interval= 0.00)
+        if self.is_command:     
+            #Führt Tastenkombination aus
+            
+            command_keys= self.button_text.split()
+            for command_key in command_keys:
+                key.keyDown(command_key)
+                print(command_key)
+                time.sleep(0.1)
+            time.sleep(0.1)
+            for command_key in reversed(command_keys):    
+                key.keyUp(command_key)
+                print(command_key)
+                time.sleep(0.1)
+            #Gibt Text ein  
+        else:              
+            key.typewrite(self.button_text, interval= 0.00)
         
     def get_text(self):     #Gibt den gespeicherten Text aus
         return self.button_text
