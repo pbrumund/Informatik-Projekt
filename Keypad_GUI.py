@@ -9,16 +9,49 @@ Buttons= []
 cur_button= 0
 
 class Arduino(object):
-    def __init__(self, window):
-        self.arduino = serial.Serial('COM7',9600,timeout=0.1)
+    def __init__(self, window, host, port):
+        #self.arduino = serial.Serial('COM7',9600,timeout=0.1)
         self.window= window
+
+        self.socket= so.socket()
+        self.socket.connect((host, port))
+        self.socket.setblocking(False)
+        self.errors= 0
+        self.buffer= bytes()
+
+        self.listen()
+
 
 
     def listen(self):
-        read = self.arduino.readline()
-        if (read):
-            i= int(read)-1
-            Buttons[i].exec_command()
+        try:
+            read = self.socket.recv(1024)
+            self.buffer+= read
+            #print(self.buffer)
+            #print(read)
+        except so.error:
+            self.errors+= 1
+            #print(self.errors)
+            if self.errors>50:
+                print('Connection failed')
+        #if (self.read):
+        while b'\n' in self.buffer:
+            read, self.buffer= self.buffer.split(b'\n')
+            #print(read)
+            read= read.decode('utf-8').strip()
+            #print(read)
+
+            if read=="t":
+                self.errors= 0
+            else:
+                i= int(read)-1
+                if 0<=i<=15:
+                    Buttons[i].exec_command()
+            #self.read=  
+            #print(self.read)
+            #i= int(read)-1
+            
+            # Buttons[i].exec_command()
         self.window.after(10,self.listen)
         
 
@@ -33,9 +66,11 @@ class Window(object):
         self.save_button= Save_button(self.window, self.text_field, self.command_checkbutton)
         self.keypad= Keypad(self.window, self.text_field, self.command_checkbutton)  #Erzeugt Keypad
 
-        self.arduino= Arduino(self.window)
-        self.arduino.listen()
-        
+        host= input('Hostname: ')
+        port= input('Port: ')
+
+        self.arduino= Arduino(self.window, host, int(port))
+                
         self.window.mainloop()
     
             
@@ -72,23 +107,13 @@ class Button (object):
     def exec_command(self):
         if self.is_command:     
             #Führt Tastenkombination aus
-            
             command_keys= self.button_text.split()
-
-
-
             for command_key in command_keys:
                 key.keyDown(command_key, pause=0.1)
-                print(command_key)
-                #time.sleep(0.001)
-            #time.sleep(0.1)
             for command_key_up in reversed(command_keys):    
-                key.platformModule._keyUp(command_key_up)
-                print(command_key_up)
-                #time.sleep(0.001)
-            #time.sleep(0.1)
-            #Gibt Text ein  
+                key.platformModule._keyUp(command_key_up)   #Normales keyUp funktioniert nicht
         else:              
+            #gibt Text ein
             key.typewrite(self.button_text, interval= 0.00)
         
     def get_text(self):     #Gibt den gespeicherten Text aus
@@ -133,6 +158,5 @@ class Command_checkbutton(object):
     def update_checked(self, checked):
         self.checked.set(checked)
 
-#key.hotkey('ctrl','shift','esc')
 window= Window()  
 

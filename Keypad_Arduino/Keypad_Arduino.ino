@@ -1,5 +1,7 @@
 #include "Key.h"
 #include "Keypad.h"
+#include <SoftwareSerial.h>
+#include "DumbServer.h"
 
 
 const byte ROWS = 4;
@@ -17,17 +19,40 @@ byte colPins[COLS] = {10, 11, 12, 13};
 
 Keypad kpd = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 
+SoftwareSerial esp_serial(3, 2);
+EspServer esp_server;
+
 void setup()
 {
   Serial.begin(9600);
+  esp_serial.begin(9600);
+  Serial.println("Starting server...");
+  esp_server.begin(&esp_serial, "arduino", "password", 30303);
+  Serial.println("...server is running");
+
+
+  /* Get and print the IP-Address the python program
+   * should connect to */
+  char ip[16];
+  esp_server.my_ip(ip, 16);
+
+  Serial.print("My ip: ");
+  Serial.println(ip);
 }
 
 void loop()
 {
   uint8_t key = kpd.getKey();
-  if (key) // Check for a valid key.
+  bool curr_connected= esp_server.connected();
+  if (key && curr_connected) // Check for a valid key.
   {
+    esp_server.println(key);
     Serial.println(key);
+  }
+  else if (curr_connected)
+  {
+    esp_server.println("t");
+    //Serial.println("t");
   }
 }
 
