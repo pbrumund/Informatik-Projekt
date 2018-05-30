@@ -6,6 +6,7 @@
 
 const byte ROWS = 4;
 const byte COLS = 4;
+unsigned long next_send = 0;
 
 uint8_t keys[ROWS][COLS] = {
   {1, 2, 3, 4},
@@ -42,17 +43,22 @@ void setup()
 
 void loop()
 {
-  uint8_t key = kpd.getKey();
-  bool curr_connected= esp_server.connected();
-  if (key && curr_connected) // Check for a valid key.
-  {
-    esp_server.println(key);
-    Serial.println(key);
-  }
-  else if (curr_connected)
-  {
-    esp_server.println("t");
+  if(millis()>next_send){
+    uint8_t key = kpd.getKey();
+    bool curr_connected= true;//esp_server.connected();
+    if (key && curr_connected) // Check for a valid key.
+    {
+     esp_server.println(key);
+     Serial.println(key);
+    }
+    else if (curr_connected)
+    {
+     esp_server.println("t");
     //Serial.println("t");
+    }
+    next_send+= 10;
+    esp_server.available();
   }
+  
 }
 

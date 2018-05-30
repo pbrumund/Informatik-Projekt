@@ -9,37 +9,45 @@ Buttons= []
 cur_button= 0
 
 class Arduino(object):
-    def __init__(self, window, host, port):
+    def __init__(self, window):
         #self.arduino = serial.Serial('COM7',9600,timeout=0.1)
         self.window= window
 
-        self.socket= so.socket()
-        self.socket.connect((host, port))
-        self.socket.setblocking(False)
+        #self.socket= so.socket()
+        self.connect_window= Connect_window(self)
+
         self.errors= 0
         self.buffer= bytes()
 
+        
+
+    def close(self):
+        self.socket.close()
+
+    def new_connection(self, host, port):
+        self.socket= so.socket()
+        self.socket.connect((host, port))
+        self.socket.setblocking(False)
+
+        self.errors= 0
         self.listen()
-
-
-
+        
     def listen(self):
         try:
             read = self.socket.recv(1024)
             self.buffer+= read
-            #print(self.buffer)
-            #print(read)
+            
         except so.error:
             self.errors+= 1
-            #print(self.errors)
-            if self.errors>50:
+        
+            if self.errors>100:
                 print('Connection failed')
-        #if (self.read):
+                self.close()
+                self.connect_window= Connect_window(self)
+                        
         while b'\n' in self.buffer:
             read, self.buffer= self.buffer.split(b'\n')
-            #print(read)
             read= read.decode('utf-8').strip()
-            #print(read)
 
             if read=="t":
                 self.errors= 0
@@ -47,13 +55,34 @@ class Arduino(object):
                 i= int(read)-1
                 if 0<=i<=15:
                     Buttons[i].exec_command()
-            #self.read=  
-            #print(self.read)
-            #i= int(read)-1
             
-            # Buttons[i].exec_command()
-        self.window.after(10,self.listen)
+        if self.errors<= 100:
+            self.window.after(10,self.listen)
+       
+class Connect_window(object):
+    def __init__(self, arduino):
+        self.arduino= arduino
+        self.connect_window= tk.Toplevel()
+        self.connect_button= tk.ttk.Button(self.connect_window, text= 'Connect', command= self.connect)
+        self.ip_field= tk.Entry(self.connect_window)
+        self.port_field= tk.Entry(self.connect_window)
         
+        self.ip_field.grid(column= 0, row= 0)
+        self.port_field.grid(column= 0, row= 1)
+        self.connect_button.grid(column= 0, row= 2)
+
+        self.ip_field.insert(0, 'Enter IP-Adress')
+        self.port_field.insert(0, 'Enter Port')
+
+    def __del__(self):
+        self.connect_window.destroy()
+
+    def connect(self):
+        host= self.ip_field.get()
+        port= int(self.port_field.get())
+        self.arduino.new_connection(host, port)
+        self.__del__()
+
 
 class Window(object):
     def __init__(self):
@@ -66,11 +95,12 @@ class Window(object):
         self.save_button= Save_button(self.window, self.text_field, self.command_checkbutton)
         self.keypad= Keypad(self.window, self.text_field, self.command_checkbutton)  #Erzeugt Keypad
 
-        host= input('Hostname: ')
-        port= input('Port: ')
 
-        self.arduino= Arduino(self.window, host, int(port))
-                
+
+        #host= input('Hostname: ')
+        #port= input('Port: ')
+
+        self.arduino= Arduino(self.window)                
         self.window.mainloop()
     
             
@@ -94,6 +124,7 @@ class Button (object):
         self.button=tk.ttk.Button(window, command= self.set_cur_button, text= name) #Erzeugt Button über tkinter
         self.button.grid(row= y, column= x)     
         self.button_text= ''   #geespeicherter Text, der geändert werden kann
+
         self.index= index   #Position in der Liste
         self.window= window
         self.text_field= text_field
@@ -155,6 +186,7 @@ class Command_checkbutton(object):
         self.checked= tk.IntVar()
         self.checkbutton= tk.ttk.Checkbutton(window, text= 'Command', variable= self.checked)
         self.checkbutton.grid(row=5, column= 3)
+        
     def update_checked(self, checked):
         self.checked.set(checked)
 
