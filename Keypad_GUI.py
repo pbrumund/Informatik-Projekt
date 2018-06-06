@@ -5,15 +5,12 @@ from tkinter import ttk
 import socket as so
 import time
 
-#Buttons= []
-#cur_button= 0
-
 class Arduino(object):
     def __init__(self, window):
         self.window= window
+        
         self.buffer= bytes()
         self.connected= False
-        self.socket= so.socket()
 
         self.connect_window= Connect_window(self)
        
@@ -25,13 +22,10 @@ class Arduino(object):
         
 
     def close(self):
-        self.socket.recv(1024)
-        self.socket.send('off'.encode('utf-8') + b'\n')
-        print('Tried to close the connection')
-        self.socket.recv(1024)
-        time.sleep(50)
-        self.socket.recv(1024)
-        self.socket.close()
+        try:
+            self.socket.close()
+        except:
+            print('Was not able to close the connection')
         self.connected= False
 
     def new_connection(self, host, port):
@@ -41,7 +35,8 @@ class Arduino(object):
             self.socket.setblocking(False)
 
             self.errors= 0
-            self.listen()
+            self.connected= True
+            self.listen()            
         except OSError:
             self.connect_window= Connect_window(self)
             print('Error')
@@ -50,7 +45,6 @@ class Arduino(object):
         try:
             read = self.socket.recv(1024)
             self.buffer+= read
-            self.connected= True
             
         except:
             self.errors+= 1
@@ -74,24 +68,26 @@ class Arduino(object):
                 except ValueError:
                     pass
             
-        if self.errors<= 500:
+        if self.connected:
             self.window.window.after(5,self.listen)
        
 class Connect_window(object):
     def __init__(self, arduino):
         self.arduino= arduino
         self.connect_window= tk.Toplevel()
+        self.connect_window.attributes("-topmost", True)
+       
         self.connect_button= tk.ttk.Button(self.connect_window, text= 'Connect', command= self.connect)
+        self.ip_label= tk.Label(self.connect_window, text= "Enter IP-Adress:")
         self.ip_field= tk.Entry(self.connect_window)
+        self.port_label= tk.Label(self.connect_window, text= "Enter Port:")
         self.port_field= tk.Entry(self.connect_window)
         
-        self.ip_field.grid(column= 0, row= 0)
-        self.port_field.grid(column= 0, row= 1)
-        self.connect_button.grid(column= 0, row= 2)
-
-        self.ip_field.insert(0, 'Enter IP-Adress')
-        self.port_field.insert(0, 'Enter Port')
-
+        self.ip_label.grid(column= 0, row= 0)
+        self.ip_field.grid(column= 1, row= 0)
+        self.port_label.grid(column= 0, row= 1)
+        self.port_field.grid(column= 1, row= 1)
+        self.connect_button.grid(column= 1, row= 2)
 
     def __del__(self):
         try:
@@ -115,14 +111,15 @@ class Window(object):
         self.cur_button= 0
         self.buttons= []
                 
-        self.label1 = tk.Label(self.window, text="Neue Belegung für Taste:")
-        self.label1.grid(row=4,column=0, columnspan= 2)
+        self.label= tk.Label(self.window, text="Neue Belegung für Taste:")
+        self.label.grid(row=4,column=0, columnspan= 2)
         self.text_field= Text_field(self)
         self.command_checkbutton= Command_checkbutton(self)
         self.save_button= Save_button(self, self.text_field, self.command_checkbutton)
         self.keypad= Keypad(self, self.text_field, self.command_checkbutton)  #Erzeugt Keypad
 
-        self.arduino= Arduino(self)                
+        self.arduino= Arduino(self)
+                 
         self.window.mainloop()
             
 
@@ -147,12 +144,14 @@ class Button (object):
         self.text_field= text_field
         self.command_checkbutton= command_checkbutton
         self.is_command= 0
+        self.button_text= ''   #geespeicherter Text, der geändert werden kann
 
         style= tk.ttk.Style()
         style.configure("Active_Button.TButton", foreground="black", background="blue")
+
         self.button=tk.ttk.Button(self.window.window, command= self.set_cur_button, text= name) #Erzeugt Button über tkinter
         self.button.grid(row= y, column= x)     
-        self.button_text= ''   #geespeicherter Text, der geändert werden kann
+        
 
         
     def change_text(self, new_text, is_command):    #ändert den Text
@@ -170,9 +169,6 @@ class Button (object):
         else:              
             #gibt Text ein
             key.typewrite(self.button_text, interval= 0.00)
-        
-    def get_text(self):     #Gibt den gespeicherten Text aus
-        return self.button_text
 
     def set_cur_button(self):      #Setzt den angeklickten Button als aktuell ausgewählten Button, der bearbeitet werden soll
         self.window.buttons[self.window.cur_button].button.configure(style= "TButton")
@@ -184,13 +180,12 @@ class Button (object):
 class Save_button (object):     #Button zum speichern
     def __init__(self, window, text_field, command_checkbutton):     #Erzeut Button
         self.window= window
-        save_button= tk.ttk.Button(window.window, command= self.save_text, text= 'Save')
-        save_button.grid(row=5, column=2)
+        self.save_button= tk.ttk.Button(window.window, command= self.save_text, text= 'Save')
+        self.save_button.grid(row=5, column=2)
         self.text_field= text_field
         self.command_checkbutton= command_checkbutton
 
     def save_text(self):       #Speichert den eingegebenen Text im Button
-        #global cur_button
         text= self.text_field.text_field.get()
         is_command= self.command_checkbutton.checked.get()
         self.window.buttons[self.window.cur_button].change_text(text, is_command)
