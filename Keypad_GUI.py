@@ -14,19 +14,29 @@ class Arduino(object):
 
         self.connect_window= Connect_window(self)
        
-    def __del__(self):
-        try:
-            self.close()
-        except OSError:
-            pass
+    #def __del__(self):
+     #   try:
+      #      self.close()
+       # except OSError:
+        #    pass
         
 
     def close(self):
-        try:
-            self.socket.close()
-        except:
-            print('Was not able to close the connection')
         self.connected= False
+        #try:
+        off_msg= 'off'
+        self.socket.send(off_msg.encode('utf-8') + b'\n')
+        time.sleep(0.05)
+        try:
+            self.socket.recv(1024)
+        except:
+            pass
+        time.sleep(0.2)
+        #self.socket.close()
+        print('Tried to close the connection')
+        #except:
+        #    print('Was not able to close the connection')
+        
 
     def new_connection(self, host, port):
         self.socket= so.socket()
@@ -107,6 +117,7 @@ class Window(object):
     def __init__(self):
         self.window= tk.Tk()
         self.window.title('Keypad')
+        self.window.protocol("WM_DELETE_WINDOW", self.on_closed)
 
         self.cur_button= 0
         self.buttons= []
@@ -121,6 +132,19 @@ class Window(object):
         self.arduino= Arduino(self)
                  
         self.window.mainloop()
+
+    def on_closed(self):
+        self.arduino.close()
+        time.sleep(1)
+        self.__del__()
+
+    def __del__(self):
+        #self.arduino.close()
+        #time.sleep(1)
+        try:
+            self.window.destroy()
+        except:
+            pass
             
 
 class Keypad(object):   #Erzeugt die Buttons des Keypads
@@ -151,9 +175,7 @@ class Button (object):
 
         self.button=tk.ttk.Button(self.window.window, command= self.set_cur_button, text= name) #Erzeugt Button über tkinter
         self.button.grid(row= y, column= x)     
-        
-
-        
+         
     def change_text(self, new_text, is_command):    #ändert den Text
         self.button_text= new_text
         self.is_command= is_command
