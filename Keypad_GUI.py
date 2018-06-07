@@ -283,7 +283,7 @@ class Load_button(object):
         
         for button in self.window.buttons:
             button.button_text = load_string[i]
-            i += 1
+            i += 1 #
                 
                 
           
