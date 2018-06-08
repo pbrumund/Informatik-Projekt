@@ -337,7 +337,7 @@ class Text_field (object):
     zugeordnete Text angezeigt.
     """
     def __init__(self, window):
-        self.text_field= tk.Entry(window.window) #Entry ist im Gegensatz zu Text von Anfang an sichtbar.
+        self.text_field= tk.Entry(window.window) 
         self.text_field.grid(row= 5, column= 0, columnspan= 2)
         
     def update_text(self, text):# Ändert den gegebenen Text
