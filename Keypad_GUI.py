@@ -149,7 +149,8 @@ class Window(object):
     """
     Definiert und erzeugt das Hauptfenster. Inhalte des Hauptfensters sind:
     Keypad(keypad), Textfeld(text_field) , Speicherknopf(save_button) und Checkbox(command_checkbutton)
-    Profilspeicherknopf(json_button)
+    Profilspeicherknopf(json_button), Profilladeknopf(load_button) und ein Textfeld um das zu 
+    ladende/speichernde Profil auszuwählen/anzulegen(save_text_field).
     """
     def __init__(self):
         self.window= tk.Tk()
@@ -161,13 +162,17 @@ class Window(object):
                 
         self.label= tk.Label(self.window, text="Neue Belegung für Taste:") 
         self.label.grid(row=4,column=0, columnspan= 2)
+        self.label2 = tk.Label(self.window,text = "Dateiname:")
+        self.label2.grid(row=10,column=0,columnspan= 2)
         self.text_field= Text_field(self)
+        self.save_text_field = Save_text_field(self)
         self.command_checkbutton= Command_checkbutton(self)
         self.save_button= Save_button(self, self.text_field, self.command_checkbutton)
         self.keypad= Keypad(self, self.text_field, self.command_checkbutton)  #Erzeugt Keypad
-        self.json_button = Json_button(self)
-        self.load_button = Load_button(self)
+        self.json_button = Json_button(self,self.save_text_field)
+        self.load_button = Load_button(self,self.save_text_field)
         self.arduino= Arduino(self)
+        
                  
         self.window.mainloop()
 
@@ -269,46 +274,77 @@ class Button (object):
         self.command_checkbutton.update_checked(self.is_command)
 
 class Json_button (object):
-    def __init__(self,window):
+    def __init__(self,window,save_text_field):
         self.window= window
         self.json_button = tk.ttk.Button(window.window, command=self.save_json,text= 'Profil speichern')
-        self.json_button.grid(row=10,column=2)
+        self.json_button.grid(row=11,column=2)
+        self.save_text_field = save_text_field
         
 
     def save_json(self):
-        
-        json_string = []
+        i = 0
+        json_list = []
+        is_command_list = []
+        write_to_json = {}
+        profil = self.save_text_field.save_text_field.get()
+
         for button in self.window.buttons:
 
-            json_string.append(button.button_text)
+            json_list.append(button.button_text)
+            is_command_list.append(button.is_command)
+
+        while i < 16:
+            write_to_json['Content'+str(i)]= str(json_list[i])
+            write_to_json['Is_Command'+str(i)]= str(is_command_list[i]) 
+            i += 1
+          
+          
             
         
 
-        with open('profil.json','w') as file:
-            
-            json.dump(json_string,file)    
+        with open(profil+".json",'w') as file:
+            json.dump(write_to_json,file)
                 
 
 class Load_button(object):
-    def __init__(self,window):
+    def __init__(self,window,save_text_field):
         self.window= window
         self.load_button = tk.ttk.Button(window.window, command = self.load,text= 'Profil laden')
-        self.load_button.grid(row=10,column=1)
+        self.load_button.grid(row=11,column=3)
+        self.save_text_field = save_text_field
 
     def load(self):
-        load_string = []
-        i = 0
-        with open('profil.json') as file:
-            load_string = json.load(file)
-            
-
         
+        i = 0
+        e = 0
+        content = []
+        iscmd = []
+        profil = self.save_text_field.save_text_field.get()
+        with open(profil+".json") as file:
+            dictionary = json.load(file)
+            while i < 16:
+                content.append(dictionary["Content"+str(i)])
+                iscmd.append(dictionary["Is_Command"+str(i)])
+                i += 1
+
+            
         for button in self.window.buttons:
-            button.button_text = load_string[i]
-            i += 1 #
+            button.button_text = content[e]
+            button.is_command = iscmd[e]
+            e += 1
                 
-                
-          
+
+class Save_text_field (object):
+   
+    def __init__(self, window):
+        self.save_text_field= tk.Entry(window.window) 
+        self.save_text_field.grid(row= 11, column= 0, columnspan= 2)
+        
+    def update_text(self, text):# Ändert den gegebenen Text
+        self.save_text_field.delete(0,'end') #Leert das Feld
+        self.save_text_field.insert(0,text)  #Neuer Text
+
+
 class Save_button (object):     
     """
     Die Klasse Save_button definiert und erzeugt den im Programmfenster angezeigten Button mit der Beschriftung 'Save', 
