@@ -21,30 +21,24 @@ class Arduino(object):
 
         self.connect_window= Connect_window(self)
 
-    def __del__(self):
+    def send_off(self):
         try:
-            self.close()
-        except OSError:
-            pass
+            for i in range(5):
+                #off_msg= 'off'
+                self.socket.send('off'.encode('utf-8') + b'\n')
+        except:
+                pass
+        self.window.window.after(900, self.close)
+        
 
     def close(self):
         self.connected= False
         try:
-            try:
-                #off_msg= '1'
-                self.socket.send('1'.encode('utf-8') + b'\n')
-            except:
-                print('Was not able to send command')
-            time.sleep(0.05)
-            try:
-                self.socket.recv(1024)
-            except:
-                pass
-            time.sleep(0.2)
             self.socket.close()
             print('Tried to close the connection')
         except:
             print('Was not able to close the connection')
+            pass
         
 
     def new_connection(self, host, port):
@@ -58,7 +52,7 @@ class Arduino(object):
             self.errors= 0
             self.connected= True
             self.listen()            
-        except OSError:
+        except:
             self.connect_window= Connect_window(self)
             print('Error')
         
@@ -135,8 +129,7 @@ class Connect_window(object):
         try:
             self.connect_window.destroy()
         except:
-            print('Connection Window does not exist')
-        
+            pass        
 
     def connect(self):
         host= self.ip_field.get()
@@ -178,17 +171,16 @@ class Window(object):
 
     def on_closed(self):
         try:
-            self.arduino.close()
-            time.sleep(1)
+            self.arduino.send_off()
         except AttributeError:
-            print('Arduino does not exist')
-        self.__del__()
+            pass
+        self.window.after(1000, self.__del__)
 
     def __del__(self):
         try:
             self.window.destroy()
         except:
-            print('Could not close Window')
+            pass
             
 
 class Keypad(object):   
@@ -276,7 +268,7 @@ class Button (object):
 class Json_button (object):
     def __init__(self,window,save_text_field):
         self.window= window
-        self.json_button = tk.ttk.Button(window.window, command=self.save_json,text= 'Profil speichern')
+        self.json_button = tk.ttk.Button(window.window, command=self.save_json,text= 'Profil\nspeichern')
         self.json_button.grid(row=11,column=2)
         self.save_text_field = save_text_field
         
@@ -309,7 +301,7 @@ class Json_button (object):
 class Load_button(object):
     def __init__(self,window,save_text_field):
         self.window= window
-        self.load_button = tk.ttk.Button(window.window, command = self.load,text= 'Profil laden')
+        self.load_button = tk.ttk.Button(window.window, command = self.load,text= 'Profil\nladen')
         self.load_button.grid(row=11,column=3)
         self.save_text_field = save_text_field
 
@@ -352,7 +344,7 @@ class Save_button (object):
     """
     def __init__(self, window, text_field, command_checkbutton):     
         self.window= window
-        self.save_button= tk.ttk.Button(window.window, command= self.save_text, text= 'Save')
+        self.save_button= tk.ttk.Button(window.window, command= self.save_text, text= 'Speichern')
         self.save_button.grid(row=5, column=2)
         self.text_field= text_field
         self.command_checkbutton= command_checkbutton
