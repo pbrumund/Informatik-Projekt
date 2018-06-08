@@ -254,17 +254,27 @@ class Json_button (object):
         
 
     def save_json(self):
-        
-        json_string = []
+        i = 0
+        json_list = []
+        is_command_list = []
+        write_to_json = {}
+
         for button in self.window.buttons:
 
-            json_string.append(button.button_text)
+            json_list.append(button.button_text)
+            is_command_list.append(button.is_command)
+
+        while i < 16:
+            write_to_json['Content'+str(i)]= str(json_list[i])
+            write_to_json['Is_Command'+str(i)]= str(is_command_list[i]) 
+            i += 1
+          
+          
             
         
 
         with open('profil.json','w') as file:
-            
-            json.dump(json_string,file)    
+            json.dump(write_to_json,file)
                 
 
 class Load_button(object):
@@ -274,17 +284,37 @@ class Load_button(object):
         self.load_button.grid(row=10,column=1)
 
     def load(self):
-        load_string = []
+        
         i = 0
+        e = 0
+        content = []
+        iscmd = []
         with open('profil.json') as file:
-            load_string = json.load(file)
+            dictionary = json.load(file)
+            while i < 16:
+                content.append(dictionary["Content"+str(i)])
+                iscmd.append(dictionary["Is_Command"+str(i)])
+                i += 1
+
+            
+            
+            
+            
+            
+            
+
+
+        
             
 
         
         for button in self.window.buttons:
-            button.button_text = load_string[i]
-            i += 1 #
-                
+            #button.button_text = load_list[i]
+            #button.is_command = load_command_list[i]
+            #i += 1 
+            button.button_text = content[e]
+            button.is_command = iscmd[e]
+            e += 1
                 
           
 class Save_button (object):     
