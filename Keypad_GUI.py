@@ -154,6 +154,8 @@ class Window(object):
                 
         self.label= tk.Label(self.window, text="Neue Belegung für Taste:") 
         self.label.grid(row=4,column=0, columnspan= 2)
+        self.label2 = tk.Label(self.window,text = "Dateiname:")
+        self.label2.grid(row=10,column=0,columnspan= 2)
         self.text_field= Text_field(self)
         self.save_text_field = Save_text_field(self)
         self.command_checkbutton= Command_checkbutton(self)
@@ -253,7 +255,7 @@ class Json_button (object):
     def __init__(self,window,save_text_field):
         self.window= window
         self.json_button = tk.ttk.Button(window.window, command=self.save_json,text= 'Profil speichern')
-        self.json_button.grid(row=10,column=2)
+        self.json_button.grid(row=11,column=2)
         self.save_text_field = save_text_field
         
 
@@ -286,7 +288,7 @@ class Load_button(object):
     def __init__(self,window,save_text_field):
         self.window= window
         self.load_button = tk.ttk.Button(window.window, command = self.load,text= 'Profil laden')
-        self.load_button.grid(row=10,column=3)
+        self.load_button.grid(row=11,column=3)
         self.save_text_field = save_text_field
 
     def load(self):
@@ -314,7 +316,7 @@ class Save_text_field (object):
    
     def __init__(self, window):
         self.save_text_field= tk.Entry(window.window) 
-        self.save_text_field.grid(row= 10, column= 0, columnspan= 2)
+        self.save_text_field.grid(row= 11, column= 0, columnspan= 2)
         
     def update_text(self, text):# Ändert den gegebenen Text
         self.save_text_field.delete(0,'end') #Leert das Feld
