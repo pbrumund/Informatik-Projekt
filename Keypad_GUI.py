@@ -42,6 +42,7 @@ class Arduino(object):
 
     def new_connection(self, host, port):
         """
+        Methode, die die Verbindung mit dem Arduino herstellt.
         """
         self.socket= so.socket()
         try:
@@ -57,6 +58,8 @@ class Arduino(object):
         
     def listen(self):
         """
+        Empfängt vom Arduino versendete Daten und stellt fest, ob 
+        überhaupt eine fehlerfreie Verbindung mit dem Arduino besteht.
         """
         try:
             read = self.socket.recv(1024)
@@ -77,6 +80,7 @@ class Arduino(object):
                         
         while b'\n' in self.buffer:
             """
+
             """
             read, self.buffer= self.buffer.split(b'\n')
             read= read.decode('utf-8').strip()
@@ -100,8 +104,9 @@ class Arduino(object):
        
 class Connect_window(object):
     """
-    Fenster, dass vor dem Aufruf des eigentlichen Bedienfensters aufgerufen wird um
-    die IP-Adresse und den Port für die aufzubauende Verbindung festzulegen. 
+    Definiert und erzeugt das Verbindungsfenster, dass zeitgleich mit dem Aufruf des eigentlichen
+    Bedienfensters aufgerufen wird um die IP-Adresse und den Port für die aufzubauende 
+    Verbindung festzulegen. 
     """
     def __init__(self, arduino):
         self.arduino= arduino
@@ -122,7 +127,7 @@ class Connect_window(object):
 
     def __del__(self):
         """
-        Schließt das Verbindungsfenster nach eingabe der Verbindungsdaten(IP,Port)
+        Schließt das Verbindungsfenster nach Eingabe der Verbindungsdaten(IP,Port)
         """
 
         try:
@@ -132,6 +137,10 @@ class Connect_window(object):
         
 
     def connect(self):
+        """
+        Stellt die Verbindung mit dem Arduino her, indem es die Verbindungsdaten
+        an die "new-connection" Methode der Klasse Arduino weitergibt.
+        """
         host= self.ip_field.get()
         port= int(self.port_field.get())
         self.arduino.new_connection(host, port)
@@ -243,7 +252,7 @@ class Button (object):
     def set_cur_button(self): 
         """
         Setzt den angeklickten Button als aktuell ausgewählten Button, der bearbeitet werden soll.
-        Der dem Button aktuell zugewiesene Text wird im Textfeld angezeigt.
+        Der dem Button aktuell zugewiesene Text, wird im Textfeld angezeigt.
         """
         self.window.buttons[self.window.cur_button].button.configure(style= "TButton")
         self.window.cur_button=self.index
@@ -252,6 +261,10 @@ class Button (object):
         self.command_checkbutton.update_checked(self.is_command)
 
 class Json_button (object):
+    """
+    Definiert und erzeugt einen Button um das Speichern von Profilen zu ermöglichen.
+    Den gewünschten Dateinamen für das Profil bezieht vom "Save_text_field" .
+    """
     def __init__(self,window,save_text_field):
         self.window= window
         self.json_button = tk.ttk.Button(window.window, command=self.save_json,text= 'Profil speichern')
@@ -260,6 +273,15 @@ class Json_button (object):
         
 
     def save_json(self):
+        """
+        Methode, mit der der den Einzelnen Tasten zugewiesene Text und der jeweilige
+        Status(Bezogen auf 'Is_command') in einer Datei(xy.json) gespeichert wird.
+        Hierfür ein Dateiname(xy) aus dem "Save_text_field" bezogen, eine Liste(json_list)
+        mit den Tastenbelegungen angelegt und eine Liste(is_command_list) mit dem Status 
+        der der Tasten(bezogen auf die "Command"-Checkbox) angelegt.
+        Die beiden Listen werden in ein Dictionary(write_to_json) zusammengefügt und 
+        im Json-Format gespeichert.
+        """
         i = 0
         json_list = []
         is_command_list = []
@@ -276,15 +298,15 @@ class Json_button (object):
             write_to_json['Is_Command'+str(i)]= str(is_command_list[i]) 
             i += 1
           
-          
-            
-        
-
         with open(profil+".json",'w') as file:
             json.dump(write_to_json,file)
                 
 
 class Load_button(object):
+    """
+    Definiert und erzeugt einen Button um das Laden von Profilen zu ermöglichen.
+    Den Namen des zu öffnenden Profils bezieht er aus dem "Save_text_field" .
+    """
     def __init__(self,window,save_text_field):
         self.window= window
         self.load_button = tk.ttk.Button(window.window, command = self.load,text= 'Profil laden')
@@ -292,7 +314,12 @@ class Load_button(object):
         self.save_text_field = save_text_field
 
     def load(self):
-        
+
+        """
+        Die im Profil im Json-Format gespeicherten Daten werden in ein Dictionary("dictionary") geladen und
+        anschließend in zwei Listen("Content" und "Is_Command")  aufgeteilt. Anschließend wird den Tasten der 
+        im jeweiligen Profil abgelegte Inhalt und Status mit einer For-Schleife zugewiesen. 
+        """
         i = 0
         e = 0
         content = []
@@ -313,14 +340,15 @@ class Load_button(object):
                 
 
 class Save_text_field (object):
-   
+    """
+    Die Klasse Save_text_field definiert und erstellt das Textfeld in dem der gewünschte Profilname(Bezogen auf
+    die Speicher/Ladefunktion) angegeben wird.
+    """
     def __init__(self, window):
         self.save_text_field= tk.Entry(window.window) 
         self.save_text_field.grid(row= 11, column= 0, columnspan= 2)
         
-    def update_text(self, text):# Ändert den gegebenen Text
-        self.save_text_field.delete(0,'end') #Leert das Feld
-        self.save_text_field.insert(0,text)  #Neuer Text
+    
 
 
 class Save_button (object):     
