@@ -28,6 +28,8 @@ Codes für Zeichen hinzugefügt:
     'ß': 0xdb,
     '^': 0xdc,
     '°': 0x1dc,
+    '€': 0x645
+
 """
 
 
@@ -259,6 +261,7 @@ keyboardMapping.update({
     '^': 0xdc,
     '°': 0x1dc,
     '§': 0x133,
+    '€': 0x645,
     #';': 0xba, # VK_OEM_1
     #'+': 0xbb, # VK_OEM_PLUS
     #',': 0xbc, # VK_OEM_COMMA

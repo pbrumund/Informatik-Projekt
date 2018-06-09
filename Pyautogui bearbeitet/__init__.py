@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, print_function
 # BSD license
 # Al Sweigart al@inventwithpython.com (Send me feedback & suggestions!)
 
-"""Bearbeitet: Umlaute und ß in KEY_NAMES hinzugefügt, in isShiftCharacter die Zeichen @#^+{}|< entfernt"""
+"""Bearbeitet: Umlaute, € und ß in KEY_NAMES hinzugefügt, in isShiftCharacter die Zeichen @#^+{}|< entfernt"""
 
 
 """
@@ -98,7 +98,7 @@ KEY_NAMES = ['\t', '\n', '\r', ' ', '!', '"', '#', '$', '%', '&', "'", '(',
      'prtsc', 'prtscr', 'return', 'right', 'scrolllock', 'select', 'separator',
      'shift', 'shiftleft', 'shiftright', 'sleep', 'space', 'stop', 'subtract', 'tab',
      'up', 'volumedown', 'volumemute', 'volumeup', 'win', 'winleft', 'winright', 'yen',
-     'command', 'option', 'optionleft', 'optionright','ü','Ü','ö','Ö','ä','Ä','ß']
+     'command', 'option', 'optionleft', 'optionright','ü','Ü','ö','Ö','ä','Ä','ß','€']
 KEYBOARD_KEYS = KEY_NAMES   # keeping old KEYBOARD_KEYS for backwards compatibility
 
 

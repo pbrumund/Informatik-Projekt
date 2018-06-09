@@ -7,8 +7,8 @@
 const byte ROWS = 4;
 const byte COLS = 4;
 unsigned long next_send = 0;
-bool closed = 0;
-bool receiving = 0;
+bool receiving = false;
+
 
 uint8_t keys[ROWS][COLS] = {
   {1, 2, 3, 4},
@@ -45,51 +45,40 @@ void setup()
 
 void loop()
 {
-
   uint8_t key = kpd.getKey();
   bool curr_connected = esp_server.connected();
-  while (esp_server.available() || receiving) {
-    //resetFunc();
+
+  while (esp_server.available()||receiving) {
     receiving = true;
     String msg = esp_server.readStringUntil('\n');
-    Serial.println("Read message");
     if (msg == "off") {
-      closed = 1;
-      //next_send = millis() + 200;
-      delay(200);
-      Serial.println("Tried to close the connection");
-      receiving = false;
       resetFunc();
       }
     else{
       Serial.println(msg);
+      receiving = false;
     }
   }
-  if(closed){
-    curr_connected = false;
-  }
-
+  
 
   if (key && curr_connected) // Check for a valid key.
   {
     esp_server.println(key);
     Serial.println(key);
   }
-  if (millis() > next_send && curr_connected) {
+
+  if (millis() > next_send && curr_connected) 
+  {
     if (esp_server.connected()) {
       esp_server.println("t");
       Serial.println("t");
     }
-
-    //Serial.println(millis());
     next_send = millis() + 50;
-    //esp_server.available();
-
   }
   
-  if (!curr_connected) {
+  if (!curr_connected) 
+  {
     Serial.println("no connection");
   }
   
 }
-

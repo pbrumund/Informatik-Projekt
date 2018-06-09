@@ -1,11 +1,8 @@
 import tkinter as tk
 import pyautogui as key
-import serial
 from tkinter import ttk
 import socket as so
-import time
 import json
-
 
 
 class Arduino(object):
@@ -21,24 +18,30 @@ class Arduino(object):
 
         self.connect_window= Connect_window(self)
 
+    def __del__(self):
+        self.close()
+
     def send_off(self):
+        """
+        Sendet Nachricht an den Arduino, dass Verbndung geschlossen werden soll,
+        dieser startet sich neu, um nicht abzustürzen.
+        """
         try:
-            for i in range(5):
-                #off_msg= 'off'
-                self.socket.send('off'.encode('utf-8') + b'\n')
+            self.socket.send('off'.encode('utf-8') + b'\n')
+            self.window.window.after(25, self.send_off) #Nachricht wird nicht jedes mal empfangen, also wird Text mehrmals gesendet
         except:
-                pass
-        self.window.window.after(900, self.close)
+            pass
         
 
     def close(self):
         self.connected= False
         try:
+            self.window.window.after_cancel(self.send_off)
             self.socket.close()
             print('Tried to close the connection')
         except:
             print('Was not able to close the connection')
-            pass
+            #pass
         
 
     def new_connection(self, host, port):
@@ -64,9 +67,7 @@ class Arduino(object):
             self.buffer+= read
             
         except:
-            self.errors+= 1
-        
-      
+            self.errors+= 1      
             if self.errors>500: 
                 """   
                 Wenn die Anzahl der gescheiterten Verbindungsversuche 500 übersteigt,
@@ -110,9 +111,9 @@ class Connect_window(object):
         self.connect_window.attributes("-topmost", True)
        
         self.connect_button= tk.ttk.Button(self.connect_window, text= 'Connect', command= self.connect)
-        self.ip_label= tk.Label(self.connect_window, text= "Enter IP-Adress:")
+        self.ip_label= tk.Label(self.connect_window, text= "IP-Adresse:")
         self.ip_field= tk.Entry(self.connect_window)
-        self.port_label= tk.Label(self.connect_window, text= "Enter Port:")
+        self.port_label= tk.Label(self.connect_window, text= "Port:")
         self.port_field= tk.Entry(self.connect_window)
         
         self.ip_label.grid(column= 0, row= 0)
@@ -123,7 +124,7 @@ class Connect_window(object):
 
     def __del__(self):
         """
-        Schließt das Verbindungsfenster nach eingabe der Verbindungsdaten(IP,Port)
+        Schließt das Verbindungsfenster nach Eingabe der Verbindungsdaten(IP,Port)
         """
 
         try:
@@ -165,8 +166,7 @@ class Window(object):
         self.json_button = Json_button(self,self.save_text_field)
         self.load_button = Load_button(self,self.save_text_field)
         self.arduino= Arduino(self)
-        
-                 
+                         
         self.window.mainloop()
 
     def on_closed(self):
