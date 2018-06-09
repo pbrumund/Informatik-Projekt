@@ -1,11 +1,8 @@
 import tkinter as tk
 import pyautogui as key
-import serial
 from tkinter import ttk
 import socket as so
-import time
 import json
-
 
 
 class Arduino(object):
@@ -20,25 +17,32 @@ class Arduino(object):
         self.connected= False
 
         self.connect_window= Connect_window(self)
-       
+
     def __del__(self):
+        self.close()
+
+    def send_off(self):
         """
+        Sendet Nachricht an den Arduino, dass Verbndung geschlossen werden soll,
+        dieser startet sich neu, um nicht abzustürzen.
         """
         try:
-            self.close()
-        except OSError:
+            self.socket.send('off'.encode('utf-8') + b'\n')
+            self.window.window.after(25, self.send_off) #Nachricht wird nicht jedes mal empfangen, also wird Text mehrmals gesendet
+        except:
             pass
         
 
     def close(self):
-        """
-        Methode, mit der die Verbindung geschlosssen werden kann
-        """
+        self.connected= False
         try:
+            self.window.window.after_cancel(self.send_off)
             self.socket.close()
+            print('Tried to close the connection')
         except:
             print('Was not able to close the connection')
-        self.connected= False
+            #pass
+        
 
     def new_connection(self, host, port):
         """
@@ -52,7 +56,7 @@ class Arduino(object):
             self.errors= 0
             self.connected= True
             self.listen()            
-        except OSError:
+        except:
             self.connect_window= Connect_window(self)
             print('Error')
         
@@ -66,9 +70,7 @@ class Arduino(object):
             self.buffer+= read
             
         except:
-            self.errors+= 1
-        
-      
+            self.errors+= 1      
             if self.errors>500: 
                 """   
                 Wenn die Anzahl der gescheiterten Verbindungsversuche 500 übersteigt,
@@ -114,9 +116,9 @@ class Connect_window(object):
         self.connect_window.attributes("-topmost", True)
        
         self.connect_button= tk.ttk.Button(self.connect_window, text= 'Connect', command= self.connect)
-        self.ip_label= tk.Label(self.connect_window, text= "Enter IP-Adress:")
+        self.ip_label= tk.Label(self.connect_window, text= "IP-Adresse:")
         self.ip_field= tk.Entry(self.connect_window)
-        self.port_label= tk.Label(self.connect_window, text= "Enter Port:")
+        self.port_label= tk.Label(self.connect_window, text= "Port:")
         self.port_field= tk.Entry(self.connect_window)
         
         self.ip_label.grid(column= 0, row= 0)
@@ -133,8 +135,7 @@ class Connect_window(object):
         try:
             self.connect_window.destroy()
         except:
-            pass
-        
+            pass        
 
     def connect(self):
         """
@@ -156,7 +157,8 @@ class Window(object):
     """
     def __init__(self):
         self.window= tk.Tk()
-        self.window.title('Keypad') 
+        self.window.title('Keypad')
+        self.window.protocol("WM_DELETE_WINDOW", self.on_closed)
 
         self.cur_button= 0
         self.buttons= []
@@ -173,9 +175,21 @@ class Window(object):
         self.json_button = Json_button(self,self.save_text_field)
         self.load_button = Load_button(self,self.save_text_field)
         self.arduino= Arduino(self)
-        
-                 
+                         
         self.window.mainloop()
+
+    def on_closed(self):
+        try:
+            self.arduino.send_off()
+        except AttributeError:
+            pass
+        self.window.after(1000, self.__del__)
+
+    def __del__(self):
+        try:
+            self.window.destroy()
+        except:
+            pass
             
 
 class Keypad(object):   
@@ -267,7 +281,7 @@ class Json_button (object):
     """
     def __init__(self,window,save_text_field):
         self.window= window
-        self.json_button = tk.ttk.Button(window.window, command=self.save_json,text= 'Profil speichern')
+        self.json_button = tk.ttk.Button(window.window, command=self.save_json,text= 'Profil\nspeichern')
         self.json_button.grid(row=11,column=2)
         self.save_text_field = save_text_field
         
@@ -309,7 +323,7 @@ class Load_button(object):
     """
     def __init__(self,window,save_text_field):
         self.window= window
-        self.load_button = tk.ttk.Button(window.window, command = self.load,text= 'Profil laden')
+        self.load_button = tk.ttk.Button(window.window, command = self.load,text= 'Profil\nladen')
         self.load_button.grid(row=11,column=3)
         self.save_text_field = save_text_field
 
@@ -358,7 +372,7 @@ class Save_button (object):
     """
     def __init__(self, window, text_field, command_checkbutton):     
         self.window= window
-        self.save_button= tk.ttk.Button(window.window, command= self.save_text, text= 'Save')
+        self.save_button= tk.ttk.Button(window.window, command= self.save_text, text= 'Speichern')
         self.save_button.grid(row=5, column=2)
         self.text_field= text_field
         self.command_checkbutton= command_checkbutton
