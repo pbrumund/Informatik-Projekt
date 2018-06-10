@@ -147,7 +147,6 @@ class Connect_window(object):
         self.arduino.new_connection(host, port)
         self.__del__()
 
-
 class Window(object):
     """
     Definiert und erzeugt das Hauptfenster. Inhalte des Hauptfensters sind:
@@ -170,10 +169,10 @@ class Window(object):
         self.text_field= Text_field(self)
         self.save_text_field = Save_text_field(self)
         self.command_checkbutton= Command_checkbutton(self)
-        self.save_button= Save_button(self, self.text_field, self.command_checkbutton)
-        self.keypad= Keypad(self, self.text_field, self.command_checkbutton)  #Erzeugt Keypad
-        self.json_button = Json_button(self,self.save_text_field)
-        self.load_button = Load_button(self,self.save_text_field)
+        self.save_button= Save_button(self)
+        self.keypad= Keypad(self)  #Erzeugt Keypad
+        self.json_button = Json_button(self)
+        self.load_button = Load_button(self)
         self.arduino= Arduino(self)
                          
         self.window.mainloop()
@@ -191,13 +190,12 @@ class Window(object):
         except:
             pass
             
-
 class Keypad(object):   
     """
     Die Klasse Keypad definiert, wie die Buttons im späteren Programm
     angeordnet sind und erzeugt sie.
     """
-    def __init__(self, window, text_field, command_checkbutton):
+    def __init__(self, window):
         self.window= window
         self.keys=[     
             ['1','2','3','A'],
@@ -208,7 +206,7 @@ class Keypad(object):
 
         for y in range(4):      
             for x in range(4):
-                self.window.buttons.append(Button(self.window, text_field, command_checkbutton, name= self.keys[y][x], x=x, y=y, index=x+(4*y)))  #Werden in Liste gespeichert
+                self.window.buttons.append(Button(self.window, label= self.keys[y][x], x=x, y=y, index=x+(4*y)))  #Werden in Liste gespeichert
         
 class Button (object):
     """
@@ -217,22 +215,19 @@ class Button (object):
     Jedem Button kann ein Text zugeordnet werden, die Variable is_command gibt mit 0 = Nein
     und 1 = Ja an, ob es sich hierbei um  einen Tastatur-Kurzbefehl handelt.
     """
-    def __init__(self, window, text_field, command_checkbutton, name, x, y, index):
+    def __init__(self, window, label, x, y, index):
         self.window= window
         self.index= index   #Position in der Liste
-        self.text_field= text_field
-        self.command_checkbutton= command_checkbutton
         self.is_command= 0      
         self.button_text= ''   #geespeicherter Text, der geändert werden kann
 
         style= tk.ttk.Style()
         style.configure("Active_Button.TButton", foreground="black", background="blue")
 
-        self.button=tk.ttk.Button(self.window.window, command= self.set_cur_button, text= name) #Erzeugt Button über tkinter
+        self.button=tk.ttk.Button(self.window.window, command= self.set_cur_button, text= label) #Erzeugt Button über tkinter
         self.button.grid(row= y, column= x)     
         
-
-        
+    
     def change_text(self, new_text, is_command):   
         """
         Methode mit der der dem Button zugewiesene Text geändert wird.
@@ -271,19 +266,18 @@ class Button (object):
         self.window.buttons[self.window.cur_button].button.configure(style= "TButton")
         self.window.cur_button=self.index
         self.window.buttons[self.window.cur_button].button.configure(style= "Active_Button.TButton")
-        self.text_field.update_text(self.button_text)      
-        self.command_checkbutton.update_checked(self.is_command)
+        self.window.text_field.update_text(self.button_text)      
+        self.window.command_checkbutton.update_checked(self.is_command)
 
 class Json_button (object):
     """
     Definiert und erzeugt einen Button um das Speichern von Profilen zu ermöglichen.
     Den gewünschten Dateinamen für das Profil bezieht vom "Save_text_field" .
     """
-    def __init__(self,window,save_text_field):
+    def __init__(self,window):
         self.window= window
         self.json_button = tk.ttk.Button(window.window, command=self.save_json,text= 'Profil\nspeichern')
         self.json_button.grid(row=11,column=2)
-        self.save_text_field = save_text_field
         
 
     def save_json(self):
@@ -300,7 +294,7 @@ class Json_button (object):
         json_list = []
         is_command_list = []
         write_to_json = {}
-        profil = self.save_text_field.save_text_field.get()
+        profil = self.window.save_text_field.save_text_field.get()
 
         for button in self.window.buttons:
 
@@ -315,17 +309,15 @@ class Json_button (object):
         with open(profil+".json",'w') as file:
             json.dump(write_to_json,file)
                 
-
 class Load_button(object):
     """
     Definiert und erzeugt einen Button um das Laden von Profilen zu ermöglichen.
     Den Namen des zu öffnenden Profils bezieht er aus dem "Save_text_field" .
     """
-    def __init__(self,window,save_text_field):
+    def __init__(self,window):
         self.window= window
         self.load_button = tk.ttk.Button(window.window, command = self.load,text= 'Profil\nladen')
         self.load_button.grid(row=11,column=3)
-        self.save_text_field = save_text_field
 
     def load(self):
 
@@ -338,7 +330,7 @@ class Load_button(object):
         e = 0
         content = []
         iscmd = []
-        profil = self.save_text_field.save_text_field.get()
+        profil = self.window.save_text_field.save_text_field.get()
         with open(profil+".json") as file:
             dictionary = json.load(file)
             while i < 16:
@@ -352,7 +344,6 @@ class Load_button(object):
             button.is_command = iscmd[e]
             e += 1
                 
-
 class Save_text_field (object):
     """
     Die Klasse Save_text_field definiert und erstellt das Textfeld in dem der gewünschte Profilname(Bezogen auf
@@ -362,30 +353,25 @@ class Save_text_field (object):
         self.save_text_field= tk.Entry(window.window) 
         self.save_text_field.grid(row= 11, column= 0, columnspan= 2)
         
-    
-
-
 class Save_button (object):     
     """
     Die Klasse Save_button definiert und erzeugt den im Programmfenster angezeigten Button mit der Beschriftung 'Save', 
     mit dem der im Textfeld eingegebene Text dem ausgewählten Button zugewiesen wird. 
     """
-    def __init__(self, window, text_field, command_checkbutton):     
+    def __init__(self, window):     
         self.window= window
         self.save_button= tk.ttk.Button(window.window, command= self.save_text, text= 'Speichern')
         self.save_button.grid(row=5, column=2)
-        self.text_field= text_field
-        self.command_checkbutton= command_checkbutton
+        
 
     def save_text(self):       #Speichert den eingegebenen Text im Button
         """
         Dem Button Save_button zugewiesenes Kommando, speichert den eingegebenen Text im Button.
         """
-        text= self.text_field.text_field.get()
-        is_command= self.command_checkbutton.checked.get()
+        text= self.window.text_field.text_field.get()
+        is_command= self.window.command_checkbutton.checked.get()
         self.window.buttons[self.window.cur_button].change_text(text, is_command)
-
-        
+     
 class Text_field (object):
     """
     Die Klasse Textfield definiert und erzeugt das im Programmfenster angezeigte Textfeld. Hier wird der Text eingegeben,
@@ -412,6 +398,5 @@ class Command_checkbutton(object):
         
     def update_checked(self,checked):
         self.checked.set(checked)
-
 
 window= Window()
