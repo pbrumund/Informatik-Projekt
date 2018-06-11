@@ -1,6 +1,6 @@
 import tkinter as tk
 import pyautogui as key
-from tkinter import ttk
+from tkinter import ttk, filedialog
 import socket as so
 import json
 
@@ -28,7 +28,7 @@ class Arduino(object):
         """
         try:
             self.socket.send('off'.encode('utf-8') + b'\n')
-            self.window.window.after(25, self.send_off) #Nachricht wird nicht jedes mal empfangen, also wird Text mehrmals gesendet
+            self.window.window.after(20, self.send_off) #Nachricht wird nicht jedes mal empfangen, also wird Text mehrmals gesendet
         except:
             pass
         
@@ -41,7 +41,6 @@ class Arduino(object):
             print('Tried to close the connection')
         except:
             print('Was not able to close the connection')
-            #pass
         
 
     def new_connection(self, host, port):
@@ -142,10 +141,13 @@ class Connect_window(object):
         Stellt die Verbindung mit dem Arduino her, indem es die Verbindungsdaten
         an die "new-connection" Methode der Klasse Arduino weitergibt.
         """
-        host= self.ip_field.get()
-        port= int(self.port_field.get())
-        self.arduino.new_connection(host, port)
-        self.__del__()
+        try:
+            host= self.ip_field.get()
+            port= int(self.port_field.get())
+            self.arduino.new_connection(host, port)
+            self.__del__()
+        except ValueError:
+            print('Value Error')
 
 class Window(object):
     """
@@ -326,29 +328,35 @@ class Load_button(object):
         anschließend in zwei Listen("Content" und "Is_Command")  aufgeteilt. Anschließend wird den Tasten der 
         im jeweiligen Profil abgelegte Inhalt und Status mit einer For-Schleife zugewiesen. 
         """
-        i = 0
-        e = 0
+        
         content = []
         iscmd = []
-        profil = self.window.save_text_field.save_text_field.get()
-        with open(profil+".json") as file:
-            dictionary = json.load(file)
-            while i < 16:
-                content.append(dictionary["Content"+str(i)])
-                iscmd.append(dictionary["Is_Command"+str(i)])
-                i += 1
 
+        filename= tk.filedialog.askopenfilename(filetypes= [("JSON File","*.json")])
+        #profil = self.window.save_text_field.save_text_field.get()
+        if filename:
+            with open(filename) as file:
+                try:
+                    dictionary = json.load(file)
+                    for i in range(16):
+                        content.append(dictionary["Content"+str(i)])
+                        iscmd.append(dictionary["Is_Command"+str(i)])
             
-        for button in self.window.buttons:
-            button.button_text = content[e]
-            button.is_command = iscmd[e]
-            e += 1
+                    for button in self.window.buttons:
+                        button.button_text = content[button.index]
+                        button.is_command = iscmd[button.index]
+
+                    self.window.buttons[0].set_cur_button()
+                except TypeError:
+                    print('Wrong Format')
+        
+
                 
 class Save_text_field (object):
     """
     Die Klasse Save_text_field definiert und erstellt das Textfeld in dem der gewünschte Profilname(Bezogen auf
     die Speicher/Ladefunktion) angegeben wird.
-    """
+    """#
     def __init__(self, window):
         self.save_text_field= tk.Entry(window.window) 
         self.save_text_field.grid(row= 11, column= 0, columnspan= 2)
