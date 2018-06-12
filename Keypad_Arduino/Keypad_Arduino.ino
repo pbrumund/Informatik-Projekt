@@ -27,12 +27,32 @@ EspServer esp_server;
 
 void(*resetFunc)(void) = 0;
 
+void check_off_msg() {
+  while (esp_server.available() || receiving) {
+    receiving = true;
+    String msg = esp_server.readStringUntil('\n');
+    if (msg == "off") {
+      resetFunc();
+    }
+  }
+}
+
+void send_pressed_button(uint8_t key) {
+  esp_server.println(key);
+  //Serial.println(key);
+}
+
+void send_test() {
+  esp_server.println("t");
+  //Serial.println("t");
+}
+
 void setup()
 {
   Serial.begin(9600);
   esp_serial.begin(9600);
   Serial.println("Starting server...");
-  esp_server.begin(&esp_serial, "arduino", "password", 30303);
+  esp_server.begin(&esp_serial, "FRITZ!Box Fon WLAN 7390", "byron1234", 30303);
   Serial.println("...server is running");
   /* Get and print the IP-Address the python program
      should connect to */
@@ -45,40 +65,23 @@ void setup()
 
 void loop()
 {
-  uint8_t key = kpd.getKey();
   bool curr_connected = esp_server.connected();
+  uint8_t key = kpd.getKey();
 
-  while (esp_server.available()||receiving) {
-    receiving = true;
-    String msg = esp_server.readStringUntil('\n');
-    if (msg == "off") {
-      resetFunc();
-      }
-    else{
-      Serial.println(msg);
-      receiving = false;
-    }
-  }
-  
+  check_off_msg();
 
-  if (key && curr_connected) // Check for a valid key.
-  {
-    esp_server.println(key);
-    Serial.println(key);
+  if (key && curr_connected) {
+    send_pressed_button(key);
   }
 
-  if (millis() > next_send && curr_connected) 
-  {
-    if (esp_server.connected()) {
-      esp_server.println("t");
-      Serial.println("t");
-    }
+  if (millis() > next_send && curr_connected) {
+    send_test();
     next_send = millis() + 50;
   }
-  
-  if (!curr_connected) 
+/*
+  if (!curr_connected)
   {
     Serial.println("no connection");
   }
-  
+*///Debugging
 }
