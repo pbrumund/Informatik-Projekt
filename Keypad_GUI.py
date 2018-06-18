@@ -6,18 +6,22 @@ import json
 
 
 class Arduino(object):
-    """
-    """
+    
+    ##Erstellt einen Arduino
+    #@param window Objekt der Klasse Window
+    
     def __init__(self, window):
-        """
-        """
+        ##@brief Objekt der Klasse Window zum Zugreifen auf dessen Parameter
         self.window= window
         
+        ##@brief Variable zum Zwischenspeichern der empfangenen Daten
         self.buffer= bytes()
+        ##@brief gibt an, ob Verbindung besteht
         self.connected= False
-
+        #Erstellt Fenster zum Verbinden
         self.connect_window= Connect_window(self)
 
+    ## Schließt beim Löschen die Verbindung
     def __del__(self):
         self.close()
 
@@ -32,31 +36,41 @@ class Arduino(object):
         except:
             pass
         
-
+    ##Schließt die Verbindung zum Arduino
     def close(self):
+        ##@brief Setzt den Zustand auf nicht verbunden
         self.connected= False
         try:
+            #Stoppt, Nachrichten zu senden
             self.window.window.after_cancel(self.send_off)
+            #Schließt den Socket
             self.socket.close()
             print('Tried to close the connection')
         except:
+            #Erscheint, wenn beim Schließen keine Verbinfung besteht
             print('Was not able to close the connection')
         
-
-    def new_connection(self, host, port):
-        """
-        Methode, die die Verbindung mit dem Arduino herstellt.
-        """
+    """
+    Methode, die die Verbindung mit dem Arduino herstellt.
+    @param host IP-Adresse des Arduinos
+    @param port Port des Arduinos
+    """
+    def new_connection(self, host, port):   
+        ##@brief Erstellt ein Objekt der Klasse Socket
         self.socket= so.socket()
         try:
+            #Versucht, Verbindung herzustellen
             self.socket.connect((host, port))
             self.socket.setblocking(False)
-
+            #Setzt die Anzahl der Fehler zurück
             self.errors= 0
+            #Setzt den Verbindungsstatus auf verbunden
             self.connected= True
             print('Connection successful')
+            #Wartet auf Kommandos vom Arduino
             self.listen()            
         except:
+            #Erzeugt neues Fenster zum Verbinden
             self.connect_window= Connect_window(self)
             print('Error')
         
@@ -66,14 +80,16 @@ class Arduino(object):
         überhaupt eine fehlerfreie Verbindung mit dem Arduino besteht.
         """
         try:
+            #Empfängt gesendete Daten, speichert sie im Buffer
             read = self.socket.recv(1024)
             self.buffer+= read
             
         except:
+            #Arduino hat keine Daten gesendet
             self.errors+= 1      
             if self.errors>500: 
                 """   
-                Wenn die Anzahl der gescheiterten Verbindungsversuche 500 übersteigt,
+                Wenn die Anzahl der gescheiterten Empfangsversuche 500 übersteigt, also 2,5s nichts empfangen wurde,
                 wird eine Fehlermeldung ausgegeben und das Verbindungsfenster wieder aufgerufen.
                 """
                 print('Connection failed') 
@@ -81,22 +97,22 @@ class Arduino(object):
                 self.connect_window= Connect_window(self)
                         
         while b'\n' in self.buffer:
-            """
-            """
+            #Teilt den Buffer in Zeilen auf und verarbeitet diese 
             try:
+                #Decodiert den Buffer
                 read, self.buffer= self.buffer.split(b'\n')
                 read= read.decode('utf-8').strip()
 
                 if read=="t":
-                    """
-                    """
+                    #Es wurde ein Testbyte empfangen, der Arduino ist also verbunden
+                    #Setzt die Fehler zurück
                     self.errors= 0
                 else:
                     try:
-                        """
-                        """
+                        #Wandelt empfangene Zahl in Index um
                         i= int(read)-1
                         if 0<=i<=15:
+                            #Ruft den Befehl des Buttons auf
                             self.window.buttons[i].exec_command()
                     except ValueError:
                         pass
@@ -104,6 +120,7 @@ class Arduino(object):
                 pass
             
         if self.connected:
+            #Falls der Arduino noch verbunden ist, wird nach 5ms erneut auf Kommandos geprüft
             self.window.window.after(5,self.listen)
 
 
@@ -111,19 +128,24 @@ class Connect_window(object):
     """
     Definiert und erzeugt das Verbindungsfenster, dass zeitgleich mit dem Aufruf des eigentlichen
     Bedienfensters aufgerufen wird um die IP-Adresse und den Port für die aufzubauende 
-    Verbindung festzulegen. 
+    Verbindung festzulegen.
+    @param arduino Objekt der Klasse Arduino 
     """
     def __init__(self, arduino):
+        ##@brief Speichert den gegebenen Arduino
         self.arduino= arduino
+        #Erzeugt Fenster
         self.connect_window= tk.Toplevel()
+        #Verschiebt Fenster nach oben
         self.connect_window.attributes("-topmost", True)
-       
+
+        #Erzeugt Bedienelemente
         self.connect_button= tk.ttk.Button(self.connect_window, text= 'Connect', command= self.connect)
         self.ip_label= tk.Label(self.connect_window, text= "IP-Adresse:")
         self.ip_field= tk.Entry(self.connect_window)
         self.port_label= tk.Label(self.connect_window, text= "Port:")
         self.port_field= tk.Entry(self.connect_window)
-        
+        #Zeigt Bedienelemente an
         self.ip_label.grid(column= 0, row= 0)
         self.ip_field.grid(column= 1, row= 0)
         self.port_label.grid(column= 0, row= 1)
@@ -151,6 +173,7 @@ class Connect_window(object):
             self.arduino.new_connection(host, port)
             self.__del__()
         except ValueError:
+            #Falsche Eingaben
             print('Value Error')
 
 
@@ -164,30 +187,43 @@ class Window(object):
     def __init__(self):
         self.window= tk.Tk()
         self.window.title('Keypad')
+        #Ändert die Routine, die beim Schließen des Fensters ausgeführt wird, um den Arduino zu benachrichtigen
         self.window.protocol("WM_DELETE_WINDOW", self.on_closed)
-
+        ##@brief Der aktuell zum Bearbeiten ausgewählte Button
         self.cur_button= 0
+        ##@brief Liste, in der die Button-Objekte gespeichert sind
         self.buttons= []
-                
+
+        #Erzeugt Label     
         self.label= tk.Label(self.window, text="Neue Belegung für Taste:") 
         self.label.grid(row=5,column=0, columnspan= 2)
-
+        #Textfeld zum Eingeben der neuen Tastenbelegung
         self.text_field= Text_field(self)
+        #Checkbutton zum Auswählen, ob eine Tastenkombination eingegeben werden soll
         self.command_checkbutton= Command_checkbutton(self)
+        #Button zum Speichern des Textes
         self.save_button= Save_button(self)
-        self.keypad= Keypad(self)  #Erzeugt Keypad
+        #Erzeugt Keypad
+        self.keypad= Keypad(self)
+        #Buttons zum Speichern des Presets
         self.json_save_button = Json_save_button(self)
         self.json_load_button = Json_load_button(self)
         
+        #Erzeugt Arduino
         self.arduino= Arduino(self)
-                         
+
+        #Übergabe an Tkinter         
         self.window.mainloop()
 
+
+    ##Sendet beim Schließen des Fensters Nachricht an Arduino, um diesen neu zu starten
+    #und so Abstürzen zu verhindern
     def on_closed(self):
         try:
             self.arduino.send_off()
         except AttributeError:
             pass
+        #Wartet bis zum Schließen des Fensters eine Sekunde, damit Nachricht empfangen wird
         self.window.after(1000, self.__del__)
 
     def __del__(self):
