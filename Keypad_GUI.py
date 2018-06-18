@@ -143,7 +143,7 @@ class Connect_window(object):
     def connect(self):
         """
         Stellt die Verbindung mit dem Arduino her, indem es die Verbindungsdaten
-        an die "new-connection" Methode der Klasse Arduino weitergibt.
+        an die "new-connection"-Methode der Klasse Arduino weitergibt.
         """
         try:
             host= self.ip_field.get()
@@ -158,8 +158,7 @@ class Window(object):
     """
     Definiert und erzeugt das Hauptfenster. Inhalte des Hauptfensters sind:
     Keypad(keypad), Textfeld(text_field) , Speicherknopf(save_button) und Checkbox(command_checkbutton)
-    Profilspeicherknopf(json_button), Profilladeknopf(load_button) und ein Textfeld um das zu 
-    ladende/speichernde Profil auszuwählen/anzulegen(save_text_field).
+    Profilspeicherknopf(json_button), Profilladeknopf(load_button).
     """
     def __init__(self):
         self.window= tk.Tk()
@@ -259,7 +258,7 @@ class Button (object):
             for command_key in command_keys:
                 key.keyDown(command_key, pause=0.1)
             for command_key_up in reversed(command_keys):    
-                key.platformModule._keyUp(command_key_up)   #Normales keyUp funktioniert nicht
+                key.platformModule._keyUp(command_key_up)   
         else:              
             """
             Falls der Text kein Tastatur-Kurzbefehl ist, wird dieser einfach ausgegeben.
@@ -281,7 +280,6 @@ class Button (object):
 class Json_save_button (object):
     """
     Definiert und erzeugt einen Button um das Speichern von Profilen zu ermöglichen.
-    Den gewünschten Dateinamen für das Profil bezieht vom "Save_text_field" .
     """
     def __init__(self,window):
         self.window= window
@@ -292,12 +290,11 @@ class Json_save_button (object):
     def save_json(self):
         """
         Methode, mit der der den Einzelnen Tasten zugewiesene Text und der jeweilige
-        Status(Bezogen auf 'Is_command') in einer Datei(xy.json) gespeichert wird.
-        Hierfür ein Dateiname(xy) aus dem "Save_text_field" bezogen, eine Liste(json_list)
-        mit den Tastenbelegungen angelegt und eine Liste(is_command_list) mit dem Status 
-        der der Tasten(bezogen auf die "Command"-Checkbox) angelegt.
-        Die beiden Listen werden in ein Dictionary(write_to_json) zusammengefügt und 
-        im Json-Format gespeichert.
+        Status(Bezogen auf 'Is_command') in einer Datei gespeichert wird. Hierfür wird 
+        eine Liste(json_list) mit den Tastenbelegungen angelegt und eine Liste(is_command_list) 
+        mit dem Status der Tasten(bezogen auf die "Command"-Checkbox) angelegt. Die beiden Listen
+        werden in ein Dictionary(write_to_json) zusammengefügt und im Json-Format gespeichert. 
+        Die Wahl des Dateinamens geschieht mithilfe des Tkinter-Moduls Filedialog.
         """
         json_list = []
         is_command_list = []
@@ -321,7 +318,6 @@ class Json_save_button (object):
 class Json_load_button(object):
     """
     Definiert und erzeugt einen Button um das Laden von Profilen zu ermöglichen.
-    Den Namen des zu öffnenden Profils bezieht er aus dem "Save_text_field" .
     """
     def __init__(self,window):
         self.window= window
@@ -331,9 +327,10 @@ class Json_load_button(object):
     def load(self):
 
         """
-        Die im Profil im Json-Format gespeicherten Daten werden in ein Dictionary("dictionary") geladen und
+        Die im Profil im Json-Format gespeicherten Daten werden in ein temporäres Dictionary("dictionary") geladen und
         anschließend in zwei Listen("Content" und "Is_Command")  aufgeteilt. Anschließend wird den Tasten der 
-        im jeweiligen Profil abgelegte Inhalt und Status mit einer For-Schleife zugewiesen. 
+        im jeweiligen Profil abgelegte Inhalt und Status mit einer For-Schleife zugewiesen. Die Auswahl der zu 
+        ladenden Datei geschieht mithilfe des Tkinter-Moduls Filedialog.
         """
         
         content = []
@@ -367,7 +364,7 @@ class Save_button (object):
         self.save_button.grid(row=6, column=2)
         
 
-    def save_text(self):       #Speichert den eingegebenen Text im Button
+    def save_text(self):       
         """
         Dem Button Save_button zugewiesenes Kommando, speichert den eingegebenen Text im Button.
         """
@@ -386,9 +383,12 @@ class Text_field (object):
         self.text_field= tk.Entry(window.window) 
         self.text_field.grid(row= 6, column= 0, columnspan= 2)
         
-    def update_text(self, text):# Ändert den gegebenen Text
-        self.text_field.delete(0,'end') #Leert das Feld
-        self.text_field.insert(0,text)  #Neuer Text
+    def update_text(self, text):
+        # Ändert den gegebenen Text
+        self.text_field.delete(0,'end') 
+        #Leert das Feld
+        self.text_field.insert(0,text)  
+        #Neuer Text
 
 
 class Command_checkbutton(object):
