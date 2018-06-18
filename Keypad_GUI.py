@@ -1,4 +1,5 @@
 import tkinter as tk
+"""Bibliothek zum Simulieren von Tasteneingaben, Änderungen im Quelltext der Dateien (__init__ und _pyautogui_win)"""
 import pyautogui as key
 from tkinter import ttk, filedialog
 import socket as so
@@ -25,11 +26,12 @@ class Arduino(object):
     def __del__(self):
         self.close()
 
+    """
+    Sendet Nachricht an den Arduino, dass Verbndung geschlossen werden soll,
+    dieser startet sich neu, um nicht abzustürzen.
+    """
     def send_off(self):
-        """
-        Sendet Nachricht an den Arduino, dass Verbndung geschlossen werden soll,
-        dieser startet sich neu, um nicht abzustürzen.
-        """
+        
         try:
             self.socket.send('off'.encode('utf-8') + b'\n')
             self.window.window.after(20, self.send_off) #Nachricht wird nicht jedes mal empfangen, also wird Text mehrmals gesendet
@@ -239,13 +241,14 @@ class Keypad(object):
     """
     def __init__(self, window):
         self.window= window
+        ##Anordnung der Buttons mit Beschriftung
         self.keys=[     
             ['1','2','3','A'],
             ['4','5','6','B'],
             ['7','8','9','C'],
             ['*','0','#','D'] 
         ]
-
+        ##Erzeugt die Buttons und speichert sie in zum Fenster gehörenden Liste
         for y in range(4):      
             for x in range(4):
                 self.window.buttons.append(Button(self.window, label= self.keys[y][x], x=x, y=y+1, index=x+(4*y)))  #Werden in Liste gespeichert
@@ -258,16 +261,27 @@ class Button (object):
     Jedem Button kann ein Text zugeordnet werden, die Variable is_command gibt mit 0 = Nein
     und 1 = Ja an, ob es sich hierbei um  einen Tastatur-Kurzbefehl handelt.
     """
+    ##Konstruktor
+    #@param window Objekt der Klasse Window
+    #@param label Beschriftung, die dargestellt wird
+    #@param x x-Koordinate
+    #@param y y-Koordinate
+    #@param index Index in der Liste
     def __init__(self, window, label, x, y, index):
+        #Fenster, in dem sich Buttons befinden, für Zugriff auf Variablen/Funtionen
         self.window= window
-        self.index= index   #Position in der Liste
-        self.is_command= 0      
-        self.button_text= ''   #geespeicherter Text, der geändert werden kann
-
+        #Position in der Liste
+        self.index= index 
+        #Gibt an, ob es sich um Tastenkombinatioin handelt
+        self.is_command= 0 
+        #gespeicherter Text, der geändert werden kann, dieser wird beim Drücken des Buttons am Auduino getippt bzw. als Tastenkombination ausgeführt   
+        self.button_text= ''   
+        #Erzeugt ttk-Style
         style= tk.ttk.Style()
         style.configure("Active_Button.TButton", foreground="black", background="blue")
 
-        self.button=tk.ttk.Button(self.window.window, command= self.set_cur_button, text= label) #Erzeugt Button über tkinter
+        #Erzeugt Button über tkinter
+        self.button=tk.ttk.Button(self.window.window, command= self.set_cur_button, text= label) 
         self.button.grid(row= y, column= x)     
         
     
@@ -288,7 +302,7 @@ class Button (object):
             """
             Führt Tastenkombination aus. Der dem Button zugewiesene Text wird
             hierfür zunächst in eine Liste einzelner Elemente aufgeteilt.
-            Mit einer For-Schleife , 
+            Mit einer For-Schleife werden die Buttons zuerst gedrückt und dann losgelassen
             """
             command_keys= self.button_text.split()
             for command_key in command_keys:
@@ -297,14 +311,14 @@ class Button (object):
                 key.platformModule._keyUp(command_key_up)   
         else:              
             """
-            Falls der Text kein Tastatur-Kurzbefehl ist, wird dieser einfach ausgegeben.
+            Falls der Text kein Tastatur-Kurzbefehl ist, wird dieser einfach mittels der typewrite-Methode von Pyautogui getippt.
             """
             key.typewrite(self.button_text, interval= 0.00)
 
     def set_cur_button(self): 
         """
         Setzt den angeklickten Button als aktuell ausgewählten Button, der bearbeitet werden soll.
-        Der dem Button aktuell zugewiesene Text, wird im Textfeld angezeigt.
+        Der dem Button aktuell zugewiesene Text wird im Textfeld angezeigt.
         """
         self.window.buttons[self.window.cur_button].button.configure(style= "TButton")
         self.window.cur_button=self.index
@@ -392,7 +406,8 @@ class Json_load_button(object):
 class Save_button (object):     
     """
     Die Klasse Save_button definiert und erzeugt den im Programmfenster angezeigten Button mit der Beschriftung 'Save', 
-    mit dem der im Textfeld eingegebene Text dem ausgewählten Button zugewiesen wird. 
+    mit dem der im Textfeld eingegebene Text dem ausgewählten Button zugewiesen wird.
+    @param window Objekt der Klasse Window
     """
     def __init__(self, window):     
         self.window= window
@@ -414,29 +429,34 @@ class Text_field (object):
     Die Klasse Textfield definiert und erzeugt das im Programmfenster angezeigte Textfeld. Hier wird der Text eingegeben,
     der dem ausgewählten Button zugewiesen werden soll. Wird ein Button ausgewählt wird hier zudem der dem Button bisher
     zugeordnete Text angezeigt.
+    @param window Objekt der Klasse Window
     """
     def __init__(self, window):
         self.text_field= tk.Entry(window.window) 
         self.text_field.grid(row= 6, column= 0, columnspan= 2)
-        
+
+    # Ändert den gegebenen Text, um Text des neu ausgewählten Buttons anzuzeigen       
     def update_text(self, text):
-        # Ändert den gegebenen Text
-        self.text_field.delete(0,'end') 
         #Leert das Feld
-        self.text_field.insert(0,text)  
+        self.text_field.delete(0,'end') 
         #Neuer Text
+        self.text_field.insert(0,text)  
+        
 
 
 class Command_checkbutton(object):
     """
     Die Klasse Command_checkbutton definiert und erzeugt die Checkbox(ttk-Style) mit der festgelegt wird, ob der 
     dem ausgewählten Button zuzuweisende Text ein Tastatur-Kurzbefehl ist oder nicht.
+    @param window Objekt der Klasse Window
     """
     def __init__(self, window):
+        ##Variable, in der Zustand des Checkbuttons gespeichert wird
         self.checked= tk.IntVar()
         self.checkbutton= tk.ttk.Checkbutton(window.window, text= 'Command', variable= self.checked)
         self.checkbutton.grid(row=6, column= 3)
-        
+
+    #Ändert den Zustand, wird aufgerufen, wenn neuer Button ausgewählt wird  
     def update_checked(self,checked):
         self.checked.set(checked)
 
