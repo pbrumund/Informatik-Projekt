@@ -82,7 +82,6 @@ class Arduino(object):
                         
         while b'\n' in self.buffer:
             """
-
             """
             try:
                 read, self.buffer= self.buffer.split(b'\n')
@@ -117,10 +116,9 @@ class Connect_window(object):
     def __init__(self, arduino):
         self.arduino= arduino
         self.connect_window= tk.Toplevel()
-        self.connect_window.title('Verbindung herstellen')
         self.connect_window.attributes("-topmost", True)
        
-        self.connect_button= tk.ttk.Button(self.connect_window, text= 'Verbinden', command= self.connect)
+        self.connect_button= tk.ttk.Button(self.connect_window, text= 'Connect', command= self.connect)
         self.ip_label= tk.Label(self.connect_window, text= "IP-Adresse:")
         self.ip_field= tk.Entry(self.connect_window)
         self.port_label= tk.Label(self.connect_window, text= "Port:")
@@ -174,12 +172,13 @@ class Window(object):
         self.label= tk.Label(self.window, text="Neue Belegung für Taste:") 
         self.label.grid(row=5,column=0, columnspan= 2)
 
-        self.save_button= Save_button(self)
         self.text_field= Text_field(self)
         self.command_checkbutton= Command_checkbutton(self)
+        self.save_button= Save_button(self)
         self.keypad= Keypad(self)  #Erzeugt Keypad
         self.json_save_button = Json_save_button(self)
         self.json_load_button = Json_load_button(self)
+        
         self.arduino= Arduino(self)
                          
         self.window.mainloop()
@@ -234,18 +233,7 @@ class Button (object):
         style.configure("Active_Button.TButton", foreground="black", background="blue")
 
         self.button=tk.ttk.Button(self.window.window, command= self.set_cur_button, text= label) #Erzeugt Button über tkinter
-        self.button.grid(row= y, column= x)
-
-        self.button.bind("<Enter>", self.preview_text)
-        self.button.bind("<Leave>", self.end_preview)
-    def preview_text(self, event):
-        if self.button_text:
-            self.window.label.config(text= self.button_text)
-        #self.window.command_checkbutton.update_checked(self.is_command)
-
-    def end_preview(self, event):
-        self.window.label.config(text= 'Neue Belegung für Taste:')
-        #self.window.command_checkbutton.update_checked(self.window.buttons[self.window.cur_button].button_text)
+        self.button.grid(row= y, column= x)     
         
     
     def change_text(self, new_text, is_command):   
@@ -327,7 +315,7 @@ class Json_save_button (object):
                 write_to_json['Is_Command'+str(i)]= str(is_command_list[i]) 
           
             with open(filename+'.json','w') as file:
-                json.dump(write_to_json,file)
+                json.dump(write_to_json,file)      
                 
 
 class Json_load_button(object):
@@ -353,19 +341,17 @@ class Json_load_button(object):
 
         filename= tk.filedialog.askopenfilename(filetypes= [("JSON File","*.json")])
         
-        if filename:
+        if filename and filename.endswith('.json'):
             with open(filename) as file:
                 try:
                     dictionary = json.load(file)
                     for i in range(16):
                         content.append(dictionary["Content"+str(i)])
-                        iscmd.append(dictionary["Is_Command"+str(i)])
-            
+                        iscmd.append(int(dictionary["Is_Command"+str(i)]))
                     for button in self.window.buttons:
-                        button.button_text = content[button.index]
-                        button.is_command = iscmd[button.index]
-
+                        button.change_text(content[button.index], iscmd[button.index])
                     self.window.buttons[0].set_cur_button()
+                    
                 except TypeError:
                     print('Wrong Format')
 
@@ -378,7 +364,6 @@ class Save_button (object):
     def __init__(self, window):     
         self.window= window
         self.save_button= tk.ttk.Button(window.window, command= self.save_text, text= 'Speichern')
-        #self.save_button.bind("<Return>", self.save_text)
         self.save_button.grid(row=6, column=2)
         
 
@@ -390,9 +375,6 @@ class Save_button (object):
         is_command= self.window.command_checkbutton.checked.get()
         self.window.buttons[self.window.cur_button].change_text(text, is_command)
 
-    """def save_text_event(self, event):
-        self.save_text()"""
-
 
 class Text_field (object):
     """
@@ -403,7 +385,6 @@ class Text_field (object):
     def __init__(self, window):
         self.text_field= tk.Entry(window.window) 
         self.text_field.grid(row= 6, column= 0, columnspan= 2)
-        #self.text_field.bind("<Return>", window.save_button.save_text_event)
         
     def update_text(self, text):# Ändert den gegebenen Text
         self.text_field.delete(0,'end') #Leert das Feld
