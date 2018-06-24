@@ -18,7 +18,7 @@ wie die Arduino-Datei). Auf dem Arduino läuft das „Keypad_Arduino“-Programm
 
 Die Pyautogui-Bibliothek wurde an das deutsche Tastaturlayout angepasst, wobei nur die Windows-
 spezifische Datei angepasst wurde. Daher können bestimmte Sonderzeichen und Umlaute nur über
-Windows eingegeben werden. Zur Installation müssen aus der offiziellen Version die \__init__- und die
+Windows eingegeben werden. Zur Installation müssen aus der offiziellen Version (<https://github.com/asweigart/pyautogui>) die \__init__- und die
 _pyautogui-win-Datei ersetzt werden.
 
 ## Verbinden mit dem Computer
