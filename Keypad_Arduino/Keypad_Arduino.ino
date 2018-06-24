@@ -1,3 +1,13 @@
+/*Grundlagen der Informatik II SS 2018
+Patrick Brumund, Niklas Altmann, Niklas Sommer
+Matrikelnummern: 4455050, 4439259, 4451649
+Projekt: Pyano
+Der Arduino dient als Server, mit dem sich das Python-Programm verbindet.
+Der Arduino ist mit einem Keypad verbunden, dessen Knöpfe nummeriert sind. 
+Wird eine der Tasten gedrückt, wird die Nummer über WLAN an den Computer übermittelt.
+Beim Schließen des Programms eine Nachricht an den Arduino gesendet, dieser wird daraufhin neu gestartet
+*/
+
 //Bibliothek für Keypad
 #include "Key.h"
 #include "Keypad.h"

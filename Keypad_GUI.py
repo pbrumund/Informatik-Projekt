@@ -1,5 +1,17 @@
+#@file Keypad_GUI
+#@author Patrick Brumund, Niklas Altmann, Niklas Sommer
+#@date 24.06.18
+#Grundlagen der Informatik II SS 2018
+#Matrikelnummern: 4455050, 4439259, 4451649
+#Projekt: Pyano
+#Über die GUI können den Knöpfen des am Arduino angeschlossenen Keypads Texte oder Tastenkombinationen zugewiesen werden. 
+#Wird der Computer über Wlan mit dem Arduino verbunden,  
+#wird bei Knopfdruck die gedrückte Taste übermittelt und am Computer der zugehörige Befehl ausgeführt. 
+#Die Konfigurationen können als Preset gespeichert und geladen werden.
+
+
 import tkinter as tk
-"""Bibliothek zum Simulieren von Tasteneingaben, Änderungen im Quelltext der Dateien (__init__ und _pyautogui_win)"""
+#Bibliothek zum Simulieren von Tasteneingaben, Änderungen im Quelltext der Dateien (__init__ und _pyautogui_win)
 import pyautogui as key
 from tkinter import ttk, filedialog
 import socket as so
@@ -12,11 +24,10 @@ class Arduino(object):
     #@param window Objekt der Klasse Window    
     def __init__(self, window):
         ##Objekt der Klasse Window zum Zugreifen auf dessen Parameter
-        self.window= window
-        
+        self.window= window        
         ##Variable zum Zwischenspeichern der empfangenen Daten
         self.buffer= bytes()
-        ##gibt an, ob Verbindung besteht
+        ##Gibt an, ob Verbindung besteht
         self.connected= False
         ##Erstellt Fenster zum Verbinden
         self.connect_window= Connect_window(self)
@@ -38,7 +49,7 @@ class Arduino(object):
         
     ##Schließt die Verbindung zum Arduino
     def close(self):
-        ##Setzt den Zustand auf nicht verbunden
+        #Setzt den Zustand auf nicht verbunden
         self.connected= False
         try:
             #Stoppt, Nachrichten zu senden
@@ -47,7 +58,7 @@ class Arduino(object):
             self.socket.close()
             print('Tried to close the connection')
         except:
-            #Erscheint, wenn beim Schließen keine Verbinfung besteht
+            #Erscheint, wenn beim Schließen keine Verbindung besteht
             print('Was not able to close the connection')
         
     
@@ -55,13 +66,13 @@ class Arduino(object):
     #@param host IP-Adresse des Arduinos
     #@param port Port des Arduinos
     def new_connection(self, host, port):   
-        #Erstellt ein Objekt der Klasse Socket
+        ##Objekt der Klasse Socket
         self.socket= so.socket()
         try:
             #Versucht, Verbindung herzustellen
             self.socket.connect((host, port))
             self.socket.setblocking(False)
-            #Setzt die Anzahl der Fehler zurück
+            ##Anzahl der Leseversuche ohne Antwort, Verbindung wird geschlossen, wenn 500 überschritten wird
             self.errors= 0
             #Setzt den Verbindungsstatus auf verbunden
             self.connected= True
