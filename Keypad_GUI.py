@@ -18,9 +18,9 @@ import socket as so
 import json
 
 
+##Klasse zu Kommunikation mit dem Arduino
 class Arduino(object):
-    
-    ##Erstellt einen Arduino
+    ##Erstellt ein Objekt der klasse Arduino. Diese verfügt über Methoden zur Kommunikation mit dem auf dem Arduino laufenden Server
     #@param window Objekt der Klasse Window    
     def __init__(self, window):
         ##Objekt der Klasse Window zum Zugreifen auf dessen Parameter
@@ -85,7 +85,8 @@ class Arduino(object):
             print('Error')
     
     ##Empfängt vom Arduino versendete Daten und stellt fest, ob 
-    ##überhaupt eine fehlerfreie Verbindung mit dem Arduino besteht.  
+    ##überhaupt eine fehlerfreie Verbindung mit dem Arduino besteht. 
+    ##Falls der Index eines Buttons gesendet wurde, wird dessen Kommando ausgeführt 
     def listen(self):
         try:
             #Empfängt gesendete Daten, speichert sie im Buffer
@@ -130,6 +131,7 @@ class Arduino(object):
             self.window.window.after(5,self.listen)
 
 
+##Fenster zum Eingeben der Verbindungsdaten
 class Connect_window(object):
     ##Definiert und erzeugt das Verbindungsfenster, dass zeitgleich mit dem Aufruf des eigentlichen
     ##Bedienfensters aufgerufen wird um die IP-Adresse und den Port für die aufzubauende 
@@ -144,11 +146,17 @@ class Connect_window(object):
         self.connect_window.attributes("-topmost", True)
 
         #Erzeugt Bedienelemente
+        ##Tkinter-Button, der versucht, Verbindung aufzubauen und das Fenster schließt
         self.connect_button= tk.ttk.Button(self.connect_window, text= 'Connect', command= self.connect)
+        ##Label: IP-Adresse
         self.ip_label= tk.Label(self.connect_window, text= "IP-Adresse:")
+        ##Textfeld zur Eingabe von IP-Adresse
         self.ip_field= tk.Entry(self.connect_window)
+        ##Label: Port
         self.port_label= tk.Label(self.connect_window, text= "Port:")
+        ##Textfeld zur Eingabe von Port
         self.port_field= tk.Entry(self.connect_window)
+        
         #Zeigt Bedienelemente an
         self.ip_label.grid(column= 0, row= 0)
         self.ip_field.grid(column= 1, row= 0)
@@ -176,6 +184,7 @@ class Connect_window(object):
             print('Value Error')
 
 
+##Hauptfenster, in dem die Konfigurationen der Buttons geändert werden können
 class Window(object):
     ##Definiert und erzeugt das Hauptfenster. Inhalte des Hauptfensters sind:
     ##Keypad(keypad), Textfeld(text_field) , Speicherknopf(save_button) und Checkbox(command_checkbutton)
@@ -191,22 +200,24 @@ class Window(object):
         ##Liste, in der die Button-Objekte gespeichert sind
         self.buttons= []
 
-        #Erzeugt Label     
+        #Erzeugt Label
+        ##Tkinter-Label     
         self.label= tk.Label(self.window, text="Neue Belegung für Taste:") 
         self.label.grid(row=5,column=0, columnspan= 2)
-        #Textfeld zum Eingeben der neuen Tastenbelegung
+        ##Textfeld zum Eingeben der neuen Tastenbelegung
         self.text_field= Text_field(self)
-        #Checkbutton zum Auswählen, ob eine Tastenkombination eingegeben werden soll
+        ##Checkbutton zum Auswählen, ob eine Tastenkombination eingegeben werden soll
         self.command_checkbutton= Command_checkbutton(self)
-        #Button zum Speichern des Textes
+        ##Button zum Speichern des Textes
         self.save_button= Save_button(self)
-        #Erzeugt Keypad
+        ##Erzeugt Keypad
         self.keypad= Keypad(self)
-        #Buttons zum Speichern des Presets
+        ##Button zum Speichern des Presets
         self.json_save_button = Json_save_button(self)
+        ##Button zum Laden eines Presets
         self.json_load_button = Json_load_button(self)
         
-        #Erzeugt Arduino
+        ##Erzeugt Objekt der Klasse Arduino, um mit Arduino zu kommunizieren
         self.arduino= Arduino(self)
 
         #Übergabe an Tkinter         
@@ -223,7 +234,7 @@ class Window(object):
         #Wartet bis zum Schließen des Fensters eine Sekunde, damit Nachricht empfangen wird
         self.window.after(1000, self.__del__)
 
-    #Schließt das Fenster, wird 1s nach Klicken des Schließen-Buttons aufgerufen
+    ##Schließt das Fenster, wird 1s nach Klicken des Schließen-Buttons aufgerufen
     def __del__(self):
         try:
             self.window.destroy()
@@ -231,10 +242,13 @@ class Window(object):
             pass
 
 
+##Erzeugt die Buttons in der korrekten Anordnung
 class Keypad(object):   
     ##Die Klasse Keypad definiert, wie die Buttons im späteren Programm
     ##angeordnet sind und erzeugt sie.
+    #@param window Window, das an Buttons übergeben wird
     def __init__(self, window):
+        ##Objekt der Klasse Window
         self.window= window
         ##Anordnung der Buttons mit Beschriftung
         self.keys=[     
@@ -249,6 +263,7 @@ class Keypad(object):
                 self.window.buttons.append(Button(self.window, label= self.keys[y][x], x=x, y=y+1, index=x+(4*y)))  #Werden in Liste gespeichert
 
 
+##Button, dem ein Text zugewiesen werden kann, entspricht den Buttons den am Arduino angeschlossenen Tastenfeldes
 class Button (object):
     ##Die Klasse Button definiert den Aufbau eines Buttons und die dazugehörigen Parameter.
     ##Die Buttons werden im ttk-Style dargestellt.
@@ -312,10 +327,13 @@ class Button (object):
         self.window.command_checkbutton.update_checked(self.is_command)
 
 
+##Button zum Speichern von Presets
 class Json_save_button (object):
     ##Definiert und erzeugt einen Button um das Speichern von Profilen zu ermöglichen.
     def __init__(self,window):
+        ##Objekt der Klasse Window
         self.window= window
+        ##Button zum Speichern, öffnet Filedialog und speichert Konfiguration
         self.json_button = tk.ttk.Button(window.window, command=self.save_json,text= 'Profil speichern')
         self.json_button.grid(row=0, column=0, columnspan= 2, sticky= tk.W+tk.E)
         
@@ -344,12 +362,15 @@ class Json_save_button (object):
           
             with open(filename+'.json','w') as file:
                 json.dump(write_to_json,file)      
-                
 
+
+##Button zum Laden von Presets
 class Json_load_button(object):
     ##Definiert und erzeugt einen Button um das Laden von Profilen zu ermöglichen.
     def __init__(self,window):
+        ##Objekt der Klasse Window
         self.window= window
+        ##Button zum Laden, öffnet Filedialog und lädt Konfiguration
         self.load_button = tk.ttk.Button(window.window, command = self.load,text= 'Profil laden')
         self.load_button.grid(row=0, column=2, columnspan= 2, sticky= tk.W+tk.E)
 
@@ -378,12 +399,15 @@ class Json_load_button(object):
                     print('Wrong Format')
 
 
+##Button zum Speichern der eingegebenen Daten
 class Save_button (object):     
     ##Die Klasse Save_button definiert und erzeugt den im Programmfenster angezeigten Button mit der Beschriftung 'Save', 
     ##mit dem der im Textfeld eingegebene Text dem ausgewählten Button zugewiesen wird.
     #@param window Objekt der Klasse Window
-    def __init__(self, window):     
+    def __init__(self, window):
+        ##Objekt der Klasse Window     
         self.window= window
+        ##Tkinter-Button zum Speichern der eingegebenen Daten auf ausgewähltem Button
         self.save_button= tk.ttk.Button(window.window, command= self.save_text, text= 'Speichern')
         self.save_button.grid(row=6, column=2)
         
@@ -396,12 +420,14 @@ class Save_button (object):
         self.window.buttons[self.window.cur_button].change_text(text, is_command)
 
 
+##Textfeld zur Eingabe von neuer Belegung
 class Text_field (object):
     ##Die Klasse Textfield definiert und erzeugt das im Programmfenster angezeigte Textfeld. Hier wird der Text eingegeben,
     ##der dem ausgewählten Button zugewiesen werden soll. Wird ein Button ausgewählt wird hier zudem der dem Button bisher
     ##zugeordnete Text angezeigt.
     #@param window Objekt der Klasse Window
     def __init__(self, window):
+        ##Tkinter-Textfeld zur Eingabe von neuer Belegung des Buttons
         self.text_field= tk.Entry(window.window) 
         self.text_field.grid(row= 6, column= 0, columnspan= 2)
 
@@ -413,16 +439,15 @@ class Text_field (object):
         self.text_field.insert(0,text)  
         
 
-
+##Checkbutton zum Auswählen, ob eine Tastenkombination ausgeführt werden soll
 class Command_checkbutton(object):
-    """
-    Die Klasse Command_checkbutton definiert und erzeugt die Checkbox(ttk-Style) mit der festgelegt wird, ob der 
-    dem ausgewählten Button zuzuweisende Text ein Tastatur-Kurzbefehl ist oder nicht.
-    @param window Objekt der Klasse Window
-    """
+    ##Die Klasse Command_checkbutton definiert und erzeugt die Checkbox(ttk-Style) mit der festgelegt wird, ob der 
+    ##dem ausgewählten Button zuzuweisende Text ein Tastatur-Kurzbefehl ist oder nicht.
+    #@param window Objekt der Klasse Window
     def __init__(self, window):
         ##Variable, in der Zustand des Checkbuttons gespeichert wird
         self.checked= tk.IntVar()
+        ##Tkinter-Checkbutton
         self.checkbutton= tk.ttk.Checkbutton(window.window, text= 'Command', variable= self.checked)
         self.checkbutton.grid(row=6, column= 3)
 
@@ -431,5 +456,5 @@ class Command_checkbutton(object):
     def update_checked(self,checked):
         self.checked.set(checked)
 
-
+#Erzeugt Hauptfenster, dieses gibt Kontrolle an Tkinter ab
 window= Window()

@@ -2,6 +2,7 @@
 Patrick Brumund, Niklas Altmann, Niklas Sommer
 Matrikelnummern: 4455050, 4439259, 4451649
 Projekt: Pyano
+Datum: 24.06.18
 Der Arduino dient als Server, mit dem sich das Python-Programm verbindet.
 Der Arduino ist mit einem Keypad verbunden, dessen Knöpfe nummeriert sind. 
 Wird eine der Tasten gedrückt, wird die Nummer über WLAN an den Computer übermittelt.
