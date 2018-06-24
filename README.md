@@ -12,13 +12,13 @@ Arduino ist außerdem über ein WLAN-Shield mit dem Computer verbunden und wird 
 passende Quelle mit Strom versorgt.
 
 Zur Installation werden für Python die Bibliotheken Pyautogui, Tkinter, Socket und JSON benötigt.
-Der Arduino benötigt die Dumb-Server-Bibliothek und die Keypad-Bibliothek (Beide im selben Ordner
+Der Arduino benötigt die Dumb-Server-Bibliothek und die Keypad-Bibliothek (https://playground.arduino.cc/Code/Keypad) (Beide im selben Ordner
 wie die Arduino-Datei). Auf dem Arduino läuft das „Keypad_Arduino“-Programm, auf dem Computer
 „Keypad_GUI“.
 
 Die Pyautogui-Bibliothek wurde an das deutsche Tastaturlayout angepasst, wobei nur die Windows-
 spezifische Datei angepasst wurde. Daher können bestimmte Sonderzeichen und Umlaute nur über
-Windows eingegeben werden. Zur Installation müssen aus der offiziellen Version (<https://github.com/asweigart/pyautogui>) die \_\_init__- und die
+Windows eingegeben werden. Zur Installation müssen aus der offiziellen Version (https://github.com/asweigart/pyautogui) die \_\_init__- und die
 _pyautogui-win-Datei ersetzt werden.
 
 ## Verbinden mit dem Computer
